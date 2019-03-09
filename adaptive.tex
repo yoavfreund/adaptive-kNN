@@ -8,6 +8,10 @@
 \usepackage{amsthm}
 \usepackage{cleveref}
 
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+
 \def\R{{\mathbb{R}}}
 \def\pr{{\rm Pr}}
 \def\E{{\mathbb E}}
@@ -25,6 +29,7 @@
 \newcommand{\Ex}{\mathbb{E}} % expected value operator
 \newcommand{\eps}{\epsilon}
 \newcommand{\sign}{\mbox{sign}}
+\newcommand{\algname}{\textsc{AKNN}}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -54,6 +59,7 @@ Here $\Delta(n,k) \sim \sqrt{(\log n)/k}$ corresponds to a confidence interval f
 
 We study this rule in the standard framework in which all data are i.i.d.\ draws from some unknown underlying distribution $P$ on $\X \times \Y$, where $\X$ is the data space and $\Y$ is the label space. We take $\X$ to be a separable metric space, with distance function $d: \X \times \X \rightarrow \R$, and we take $\Y = \{-1,+1\}$. 
 \yoav{We have two variants. The one described here, which only assumes a metric space, and the one in which we assume a euclidean space. The first is more general, the second is needed for active learning. I suggest we write the paper for case 1, and add a section at the end regarding case 2.}
+\shay{Note that in the second one, where we assume a low VC dimension of the entire family of balls also allow for a faster rate (I believe that the assumptions we pick will yield a logarithmic rate in $1/\delta$). Therefore, if we also wish to discuss rates of convergence in this paper then we should consider including it.}
 We can decompose $P$ into the marginal distribution $\mu$ on $\X$ and the conditional expectation of the label at each point $x$: if $(X,Y)$ represents a random draw from $P$, define $\eta(x) = \E(Y| X = x)$. In this terminology, the Bayes-optimal classifier is the rule $g^*: \X \rightarrow \{-1,+1\}$ given by
 $$ g^*(x) = \sign(\eta(x)) $$
 and its error rate is $R^* = \frac{1}{2}\E_{X \sim \mu} \left[1-|\mu(X)| \right]$. A variety of nonparametric classification schemes are known to have error rates that converge asymptotically to $R^*$. These include $k$-nearest neighbor (henceforth, $k$-NN) rules in which $k$ grows with the number of training points $n$ according to a suitable schedule $(k_n)$, under certain technical conditions on the metric measure space $(\X, d, \mu)$.
@@ -147,7 +153,7 @@ For any $x \in \supp(\mu)$ and $p > 0$, let $r_p(x)$ denote the smallest radius 
 $$ r_p(x) = \inf \{r > 0: \mu(B(x,r)) \geq p \} .$$
 Then $\mu(B(x,r_p(x))) \geq p$.
 
-We now characterize the region of $\X$ that the adaptive rule is likely to correctly classify as having label $1$, given $n$ training points. It is the set $\X^+_n$ of points $x \in \supp(\mu)$, with $\eta(x) > 1/2$, for which there exists $p_x > 0$ such that:
+We now characterize the region of $\X$ that $\algname$ is likely to correctly classify as having label $1$, given $n$ training points. It is the set $\X^+_n$ of points $x \in \supp(\mu)$, with $\eta(x) > 1/2$, for which there exists $p_x > 0$ such that:
 \begin{itemize}
 \item $\eta(B(x,r_{p_x}(x))) \geq \frac{1}{2} + c_2 \sqrt{\frac{\log (n/\delta)}{np_x}}$, where $c_2 = \max(2c_1, 1/2) \sqrt{1+c_0}$. 
 \item $\eta(B(x,r)) \geq 1/2$ for all $0 < r \leq r_{p_x}(x)$. 
@@ -162,29 +168,7 @@ The set $\X^-_n$ can be defined symmetrically, as consisting of $x \in \supp(\mu
 Fix any $x \in \X^+_n \cup \X^-_n$. Pick $n$ training points at random from $P$. With probability at least $1-\delta^2$ over the choice of training data, the adaptive $k$-NN rule will predict 1 if $x \in \X^+_n$, or $0$ if $x \in \X^-_n$.
 \label{lemma:good-sets}
 \end{lemma}
-\begin{proof}
-Fix any $x \in \X^+_n$; the case of $x \in \X^-_n$ is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension 1. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
-\begin{enumerate}
-\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
-\item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B))$.
-\end{enumerate}
-Assume henceforth that these hold.
 
-Let $p = p_x$ be as specified in the definition of $\X^+_n$. Set $k = np/(1 + c_0)$. We first observe that $k \geq \log (n/\delta)$. This is because the definition of $p$ implies $c_2 \sqrt{\log (n/\delta)/(np)} \leq 1/2$ and thus $np \geq 4 c_2^2 \log (n/\delta) \geq (1+c_0) \log (n/\delta)$.
-
-As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$. Thus, by property 1, the ball $B = B(x, r_p(x))$ has $\mu_n(B) \geq k/n$. This means, in turn, that by property 2,
-\begin{align*}
-\bias_n(B) &\geq \bias(B) - \Delta(n, k) \\
-&\geq c_2 \sqrt{\frac{\log (n/\delta)}{np}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
-&\geq 2c_1 \sqrt{\frac{\log (n/\delta)}{k}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
-&= c_1 \sqrt{\frac{\log (n/\delta)}{k}} \geq \Delta(n, n \mu_n(B)) .
-\end{align*}
-Thus ball $B$ would trigger a prediction of $1$.
-
-At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
-$$ \bias_n(B') \geq \bias(B') - \Delta(n, n \mu_n(B')) > -\Delta(n, n \mu_n(B')) $$
-and thus no such ball will trigger a prediction of $0$. Therefore, the prediction at $x$ must be $1$.
-\end{proof}
 
 Based on this result, it makes sense to define the {\it effective boundary} when there are $n$ data points as 
 $$ \partial_n = \X \setminus (\X^+_n \cup \X^-_n) .$$
@@ -195,20 +179,7 @@ $$ \pr_{X}(g_n(X) \neq g^*(X)) \ \leq \ \delta + \mu(\partial_n) .$$
 Here $g_n$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. \shay{The quantification over $\delta$ confuses me; note that the adaptive nearest neighbor classifier $g_n$ gets $\delta$ as an input (because the threshold $\Delta(n,k)$ does).} 
 \label{thm:general-error-bound}
 \end{theorem}
-\begin{proof}
-From Lemma~\ref{lemma:good-sets}, we have that for any $x \in \X^+_n \cup \X^-_n$, 
-$$ \pr_n(g_n(x) \neq g^*(x)) \leq \delta^2 ,$$
-where $\pr_n$ denotes probability over the choice of training points. Thus, for $X \sim \mu$,
-$$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X^+_n \cup \X^-_n) \leq \delta^2 ,$$
-and by Markov's inequality,
-$$ \pr_n [\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_n \cup \X^-_n) \geq \delta] \leq \delta.$$
-Thus, with probability at least $1-\delta$ over the training set,
-$$\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_n \cup \X^-_n) \leq \delta$$
-and
-$$ \pr_X(g_n(X) \neq g^*(X)) 
-\ \leq \ \delta \ \pr(X \in \X^+_n \cup X^-_n) + \pr(X \not\in \X^+_n \cup \X^-_n)
-\ \leq \ \delta + \mu(\partial_n) .$$
-\end{proof}
+
 
 It follows, using the same argument as in \cite{ChaudhuriDasgupta2014}, that the adaptive nearest neighbor rule is universally consistent as long as the metric space $(\X, d, \mu)$ satisfies Lebesgue's differentiation condition: that is, for any bounded measurable $f: \X \rightarrow \R$ and for $\mu$-almost\footnote{I.e., the set of points which does not satisfy the condition has measure $0$ under $\mu$.} every $x$,
 $$ \lim_{r \downarrow 0} \frac{1}{\mu(B(x,r))} \int_{B(x,r)} f \ d\mu = f(x) .$$
@@ -218,7 +189,56 @@ one should tune $\delta= \delta(n)$ such that $\delta(n)\to_{n\to\infty} 0$.
 (note that $\delta$ is a parameter of our algorithm, unlike in \cite{ChaudhuriDasgupta2014}, where $\delta$
 was just defined for sake of analysis). }
 
+
+
+\section{High-probability convergence}
+
+In this section, we make a further assumption that allows us to strengthen \Cref{thm:general-error-bound}, tightly quantifying over all query points simultaneously. 
+\begin{assump}
+\label{assump:VCallballs}
+The family of all balls in $(\X, d)$ has VC dimension $d_0 < \infty$.
+\end{assump}
+This is motivated by finite-dimensional Euclidean space $\mathbb{R}^{D}$, where \Cref{assump:VCallballs} is satisfied with $d_0 = D+1$ \citep{dudley79}. Given such a $d_0$ and parameter $\delta$, define $\kappa_{n, \delta} := d_0 \log n + \log (1/\delta)$. 
+For $s \in \{ -1, +1 \}$, define the following quantities that depend on the algorithm's lone confidence parameter $\delta$:
+\begin{align*}
+\X^{s}_n (\delta)
+:= \Bigg\{
+x \in \supp(\mu) : s \eta(x) > 0 , \exists p_x > 0 \text{ s.t. } 
+&s \eta(B(x,r_{p_x}(x))) \geq 2 c_2 \sqrt{\frac{ \kappa_{n, \delta} }{n p_x}}
+\quad\text{and}\quad \\
+&s \eta(B(x,r)) \geq 0 \quad\forall r \in (0, r_{p_x}(x)]
+\Bigg\}
+\end{align*}
+where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_0}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
+Also define 
+$$ \partial_n (\delta) = \X \setminus (\X^+_n (\delta) \cup \X^-_n (\delta)) $$
+Then our main convergence rate result in this scenario shows that the measure of the effective boundary bounds the convergence of $\algname$.
+
+
+\begin{theorem}\label{thm:fastrate2}
+Let $\delta$ be the confidence parameter of the $\algname$ algorithm, and suppose \Cref{assump:VCallballs} holds with VC dimension $d_0$.
+Then, with probability at least $1-\delta$ over the choice of training points,
+\[ \pr_{X}(g_n(X) \neq g^*(X)) \ \leq \ \mu(\partial_n (\delta)) .\]
+Here $g_n$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. 
+\end{theorem}
+
+\akshay{Is it worth showing that \Cref{thm:fastrate2} is tight, e.g. the instance-dependent lower bounds of \cite{ChaudhuriDasgupta2014}?}
+
+
+
+The difference with \Cref{thm:general-error-bound} is that the $\delta$ term is removed.
+
+{\it To summarize, for convergence in expectation we bound the error by $\delta + \mu(\partial_n)$,
+and for convergence with high probability we bound it by $\mu(\partial_n)$.}
+So, in order to get explicit bounds in both settings, we need to figure out how $\mu(\partial_n)$ decays under natural assumptions. It would be nice if we could get something like 
+\[\mu(\partial_n (\delta)) \leq \mathrm{poly}\left(\log(1/\delta), n\right),
+\]
+with hidden constant depending on the assumptions we make.
+\akshay{Here I think the smoothness condition introduced in \cite{ChaudhuriDasgupta2014} is relevant.}
+
+
 \section{Rates of convergence}
+
 
 \subsubsection{Shay's comments}
 
@@ -226,76 +246,11 @@ There are two natural settings we could consider: (i) convergence in expectation
 Convergence in expectation boils down to \Cref{thm:general-error-bound} in the previous section.
 For convergence with high probability we further assume that the VC dimension of the family of all balls is bounded. 
 Note that in this case we should also change the definition of $\Delta(n,k)$  in the algorithm so that it has the right dependence on the VC dimension. \akshay{It's already correct in the initial definition of the algorithm, but not consistent in the definitions of $\X^{\pm}_n$.} What we can prove in this case is \Cref{thm:fastrate} (stated in a subsection below), 
-which can also be phrased more similarly to \Cref{thm:general-error-bound}) as follows:
-\begin{theorem}\label{thm:fastrate2}
-Let $\delta$ be the confidence parameter of the adaptive nearest neighbor algorithm,
-and assume that the family of all balls in $(X,d)$ has VC dimension $d_0$.
-Then, with probability at least $1-\delta$ over the choice of training points,
-\[ \pr_{X}(g_n(X) \neq g^*(X)) \ \leq \ \mu(\partial_n) .\]
-Here $g_n$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. 
-\end{theorem}
-The difference with \Cref{thm:general-error-bound} is that $\delta$ term is removed.
+which can also be phrased more similarly to \Cref{thm:general-error-bound}) as in \Cref{thm:fastrate2}.
 
-{\it To summarize, for convergence in expectation we bound the error by $\delta + \mu(\partial_n)$,
-and for convergence with high probability we bound it by $\mu(\partial_n)$.}
-So, in order to get explicit bounds in both settings, we need to figure out how $\mu(\partial_n)$ decays under natural assumptions. It would be nice if we could get something like 
-\[\mu(\partial_n) \leq \mathrm{poly}\left(\log(1/\delta), n\right),
-\]
-with hidden constant depending on the assumptions we make.
 
 
 \subsubsection{Akshay's notes}
-
-Given VC dimension bound $d_0$ and parameter $\delta$, define the high-probability-convergence versions of $\X^{\pm}_n$ as:
-\begin{itemize}
-\item 
-$\X^+_n (\delta)$ of points $x \in \supp(\mu)$ with $\eta(x) > 1/2$, for which $\exists p_x > 0$ such that
-\begin{align*}
-\eta(B(x,r_{p_x}(x))) \geq \frac{1}{2} + c_2 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{n p_x}}
-\qquad\text{and}\qquad
-\eta(B(x,r)) \geq 1/2 \quad\forall\quad 0 < r \leq r_{p_x}(x)
-\end{align*}
-where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_0}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
-\item
-$\X^-_n (\delta)$ defined symmetrically
-\item
-$\partial_n (\delta) = \X \setminus (\X^+_n (\delta) \cup \X^-_n (\delta))$
-\end{itemize}
-Define $\gamma_{n, \delta} := d_0 \log n + \log (1/\delta)$. %\akshay{We would like this to be $d_0 \log n + \log (1/\delta)$; the difference is in \Cref{lemma:points-in-balls}.} 
-Finally, a version of \Cref{lemma:points-in-balls} from \cite{ChaudhuriDasgupta2010} is useful:
-\begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 16]
-\label{lemma:points-in-balls-2}
-There is an absolute constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
-$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \left( \gamma_{n, \delta} + \sqrt{k \gamma_{n, \delta}} \right)
-\ \ \implies \ \ 
-\mu_n(B) \geq \frac{k}{n} $$
-\end{lemma}
-
-\begin{proof}[Proof of \Cref{thm:fastrate2}]
-We adapt the argument of \Cref{lemma:good-sets}. 
-Recall that we take the set $\B$ of all closed balls in $\X$ to have VC dimension at most $d_0$. 
-By \Cref{lemma:points-in-balls-2} and \Cref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
-\begin{enumerate}
-\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \left( \gamma_{n, \delta} + \sqrt{k \gamma_{n, \delta}} \right)$
-\item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B)) = c_1 \sqrt{\frac{\gamma_{n, \delta}}{n \mu_n(B)}}$
-\end{enumerate}
-Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_n (\delta) \cup \X^-_n (\delta)$ w.p. 1 under $\mu$. 
-
-The argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\gamma_{n, \delta}$. We state the argument for $x \in \X^+_n (\delta)$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_n (\delta)$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\gamma_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \gamma_{n, \delta} \geq \varphi^2 (1+c_0) \gamma_{n, \delta}$, so that $k(x) \geq \varphi^2 \gamma_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \gamma_{n, \delta} + \sqrt{ \gamma_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
-\begin{align*}
-\bias_n(B) &\geq \bias(B) - \Delta(n, k(x) ) 
-\geq c_2 \sqrt{\frac{\gamma_{n, \delta}}{np}} - c_1 \sqrt{\frac{\gamma_{n, \delta}}{k(x)}} 
-\geq 2c_1 \sqrt{\frac{\gamma_{n, \delta}}{k(x)}} - c_1 \sqrt{\frac{\gamma_{n, \delta}}{k(x)}} 
-\geq \Delta(n, n \mu_n(B))
-\end{align*}
-So ball $B$ would trigger a prediction of $1$.
-At the same time, for any ball $B' = B(x, r)$ with $r < r_{p(x)} (x)$,
-$$ \bias_n(B') \geq \bias(B') - \Delta(n, n \mu_n(B')) > -\Delta(n, n \mu_n(B')) $$
-and thus no such ball will trigger a prediction of $0$. Therefore, the algorithm's prediction at $x$ must be $1$.
-
-The argument for $x \in \X^-_n (\delta)$ proceeds exactly symmetrically. 
-\end{proof}
-
 
 
 \subsubsection{Sanjoy's notes}
@@ -327,9 +282,11 @@ Let $\X_{\alpha}^+$ be the set of points $x \in \X$ such that there exist $p,\ga
 
 Then we have the following theorem:
 \begin{theorem}\label{thm:fastrate}
-For all $\alpha>0$ and all $x \in \X_{\alpha}^+ \cup \X_{\alpha}^-$ the probability that AKNN predicts incorrectly on $x$ is upper bounded by $\exp(-c n \alpha)$.
+For all $\alpha>0$ and all $x \in \X_{\alpha}^+ \cup \X_{\alpha}^-$ the probability that $\algname$ predicts incorrectly on $x$ is upper bounded by $\exp(-c n \alpha)$.
 \end{theorem}
 
+
+\section{Related Work}
 
 
 
@@ -348,7 +305,7 @@ It is natural to consider the empirical estimates:
 \[p_n(A\vert B)=\frac{\sum_i 1_{[x_i\in A \cap B]}}{\sum_i 1_{[x_i\in B]}}.\]
 We study how well these estimates provide a good approximation to $p$.
 
-To demonstrate the kind of statements we would like to derive,
+To demonstrate the kinds of statements we would like to derive,
 consider the case where there is only one event $B$ in $\cB$, 
 and set $k(B)=\sum_i 1_{[x_i\in B]}$.
 A Chernoff bound implies that conditioned on the event $k(B)>0$, 
@@ -866,6 +823,88 @@ that this probability is at most $\delta/2$.
 
 \bibliography{ref}
 \bibliographystyle{alpha}
+
+
+
+\appendix
+
+\section{Proofs}
+
+\begin{proof}[Proof of \Cref{lemma:good-sets}]
+Fix any $x \in \X^+_n$; the case of $x \in \X^-_n$ is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension 1. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
+\begin{enumerate}
+\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
+\item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B))$.
+\end{enumerate}
+Assume henceforth that these hold.
+
+Let $p = p_x$ be as specified in the definition of $\X^+_n$. Set $k = np/(1 + c_0)$. We first observe that $k \geq \log (n/\delta)$. This is because the definition of $p$ implies $c_2 \sqrt{\log (n/\delta)/(np)} \leq 1/2$ and thus $np \geq 4 c_2^2 \log (n/\delta) \geq (1+c_0) \log (n/\delta)$.
+
+As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$. Thus, by property 1, the ball $B = B(x, r_p(x))$ has $\mu_n(B) \geq k/n$. This means, in turn, that by property 2,
+\begin{align*}
+\bias_n(B) &\geq \bias(B) - \Delta(n, k) \\
+&\geq c_2 \sqrt{\frac{\log (n/\delta)}{np}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
+&\geq 2c_1 \sqrt{\frac{\log (n/\delta)}{k}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
+&= c_1 \sqrt{\frac{\log (n/\delta)}{k}} \geq \Delta(n, n \mu_n(B)) .
+\end{align*}
+Thus ball $B$ would trigger a prediction of $1$.
+
+At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
+$$ \bias_n(B') \geq \bias(B') - \Delta(n, n \mu_n(B')) > -\Delta(n, n \mu_n(B')) $$
+and thus no such ball will trigger a prediction of $0$. Therefore, the prediction at $x$ must be $1$.
+\end{proof}
+
+
+\begin{proof}[Proof of \Cref{thm:general-error-bound}]
+From Lemma~\ref{lemma:good-sets}, we have that for any $x \in \X^+_n \cup \X^-_n$, 
+$$ \pr_n(g_n(x) \neq g^*(x)) \leq \delta^2 ,$$
+where $\pr_n$ denotes probability over the choice of training points. Thus, for $X \sim \mu$,
+$$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X^+_n \cup \X^-_n) \leq \delta^2 ,$$
+and by Markov's inequality,
+$$ \pr_n [\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_n \cup \X^-_n) \geq \delta] \leq \delta.$$
+Thus, with probability at least $1-\delta$ over the training set,
+$$\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_n \cup \X^-_n) \leq \delta$$
+and
+$$ \pr_X(g_n(X) \neq g^*(X)) 
+\ \leq \ \delta \ \pr(X \in \X^+_n \cup X^-_n) + \pr(X \not\in \X^+_n \cup \X^-_n)
+\ \leq \ \delta + \mu(\partial_n) .$$
+\end{proof}
+
+
+To prove \Cref{thm:fastrate2}, a relevant application of VC theory from \cite{ChaudhuriDasgupta2010} is useful:
+\begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 16]
+\label{lemma:points-in-balls-2}
+There is an absolute constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
+$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)
+\ \ \implies \ \ 
+\mu_n(B) \geq \frac{k}{n} $$
+\end{lemma}
+
+\begin{proof}[Proof of \Cref{thm:fastrate2}]
+Recall that we take the set $\B$ of all closed balls in $\X$ to have VC dimension at most $d_0$. 
+By \Cref{lemma:points-in-balls-2} and \Cref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
+\begin{enumerate}
+\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
+\item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B)) = c_1 \sqrt{\frac{\kappa_{n, \delta}}{n \mu_n(B)}}$
+\end{enumerate}
+Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_n (\delta) \cup \X^-_n (\delta)$ w.p. 1 under $\mu$. 
+
+This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_n (\delta)$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_n (\delta)$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
+\begin{align*}
+\bias_n(B) &\geq \bias(B) - \Delta(n, k(x) ) 
+\geq c_2 \sqrt{\frac{\kappa_{n, \delta}}{np}} - c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} 
+\geq 2c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} - c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} 
+\geq \Delta(n, n \mu_n(B))
+\end{align*}
+So ball $B$ would trigger a prediction of $+1$.
+At the same time, for any ball $B' = B(x, r)$ with $r < r_{p(x)} (x)$,
+$$ \bias_n(B') \geq \bias(B') - \Delta(n, n \mu_n(B')) > -\Delta(n, n \mu_n(B')) $$
+and thus no such ball will trigger a prediction of $-1$. Therefore, the algorithm's prediction at $x$ must be $+1$.
+
+The argument for $x \in \X^-_n (\delta)$ proceeds exactly symmetrically. 
+\end{proof}
+
+
 
 
 \end{document}
