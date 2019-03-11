@@ -47,6 +47,7 @@
 \newcommand{\shay}[1]{\comment{purple}{Shay}{#1}}
 \newcommand{\akshay}[1]{\comment{blue}{Akshay}{#1}}
 \newcommand{\yoav}[1]{\comment{green}{Yoav}{#1}}
+\newcommand{\yoavv}[1]{\comment{green}{Yoav}{#1}}
 \newcommand{\sanjoy}[1]{\comment{orange}{Sanjoy}{#1}}
 
 \title{An adaptive nearest neighbor rule for classification}
@@ -196,20 +197,54 @@ Let $g_n: \X \rightarrow \{0,1,?\}$ denote this classifier.
 \section{Universal consistency}
 \label{sec:universal-consistency}
 In this section we should that $g_n$ converges the the Bayes rule as
-$n \ to \infty$.
+$n \to \infty$.
 
 
-\section{Interior and boundary sets}
-Following ~\cite{} we define the interior and boundary sets for \algname.
+\section{Pointwise Advantage}
 
-For any $x \in \supp(\mu)$ and $p > 0$, let $r_p(x)$ denote the
-smallest radius such that the probability mass of $B(x, r_p(x))$ is at
-least $p$:
-$$ r_p(x) = \inf \{r > 0: \mu(B(x,r)) \geq p \} .$$
-Then $\mu(B(x,r_p(x))) \geq p$.
+\newcommand{\advantage}{\mbox{adv}}
+\newcommand{\opt}{\mbox{Opt}}
+\newcommand{\eopt}{\epsilon \mbox{-Opt}}
 
-Let $n$ be the size of the training set, let $1>\delta>0$ be a
-confidence parameter and let $y \in \{-1,+1\}$ be one of the two labels.
+In this section we define the optimal advantage $\opt(x)$ which
+characterizes the convergence rate of \algname\ at the point $x$.
+
+Let $x \in \supp(\mu)$ and assume $\mu(x) \neq 0$. Define the sign of
+$x$ to be $s(x) \doteq \sign(\eta(x))$.
+
+\newcommand{\rsupp}{r_{\mbox{supp}}}
+Define the support of $x$ to be range of small balls that agree with
+the sign of $x$:
+\begin{equation}
+\rsupp = \sup \left\{ r>0 \mbox{ s.t. } \forall r' \leq r \mbox{ and } \sign(\eta(B(x,r')))
+  =  s(x) \right\}
+\end{equation}
+
+The majority vote for each ball of radius $0 \leq r \leq r'$ converges
+to the correct label as the size of the training set grows. However,
+some balls will converge faster than others.
+We quantify the convergence rate of the ball $B(x,r)$ using the
+{\em advantage} of the ball which we define as
+\begin{equation}
+\advantage(B(x,r)) \doteq \mu(B(x,r)) \eta(B(x,r))^2
+\end{equation}
+
+We define the optimal advantage for $x$ to be $\opt(x)= \sup_r \advantage(B(x,r))$
+
+\iffalse
+Finally, for each $\epsilon>0$ we define the {\em $\epsilon$-optimal} ball for $x$ as the smallest ball
+whose advantage is $\epsilon$ close to the supremum.
+\[
+\eopt(x) = \min \left\{ 0<r\leq \rsupp \mbox{ s.t. } \advantage(B(x,r)) \geq
+\opt(x)-\epsilon \right\}
+\]
+\yoavv{I wish I could get rid of this epsilon, but I think the
+  supremum is not always achieved.}
+\fi
+
+\iffalse
+The optimal advantage $\opt(x)$ determines the rate of convrgence of
+\algname\ at $x$. 
 
 The $y$ interior set $\X^y_{n,\delta}$ is set of points $x \in \supp(\mu)$, for which 
 there exists $p_x > 0$ such that:
@@ -219,7 +254,7 @@ there exists $p_x > 0$ such that:
 \item $y \eta(B(x,r)) \geq 0 $ for all $0 < r \leq r_{p_x}(x)$. 
 \end{itemize}
 
-The following Lemma shows that, with high probability, \ouralg makes
+The following Lemma shows that, with high probability, \algname\ makes
 the correct predictions on the interior points.
 \begin{lemma}
 Fix any $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$. Pick $n$
@@ -247,19 +282,7 @@ This holds in any finite-dimensional normed space, or any doubling metric space.
 one should tune $\delta= \delta(n)$ such that $\delta(n)\to_{n\to\infty} 0$.
 (note that $\delta$ is a parameter of our algorithm, unlike in \cite{ChaudhuriDasgupta2014}, where $\delta$
 was just defined for sake of analysis). }
-
-\section{Prediction margin}
-Most existing convergence rate results for KNN assume that $\mu(x)$ is
-a smooth function.
-
-In this work we prove convergence bounds on  \algname\ which do not
-require smoothness. Instead, the bounds depend on a pointwise quantity
-which we call the {\em prediction margin}. We say that a point $x \in \supp(\mu)$
-has margin $m(x)$ if there exists a radius $r(x)>0$ such that 
-\begin{enumerate}
-\item $$ \mu(B(x,r(x))) \eta(B(x,r(x)))^2 = m(x) $$
-\item for all $0<r'<r(x)$, $\sign(\eta(B(x,r))) = \sign(\eta(B(x,r(x))))$
-\end{enumerate}
+\fi 
 
 
 \section{Large deviation bounds}
