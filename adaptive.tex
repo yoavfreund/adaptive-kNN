@@ -42,10 +42,13 @@
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-\newcommand{\new}[1]{{\color{red} #1}}
-\newcommand{\shay}[1]{{\color{purple} {\bf Shay:} #1}}
-\newcommand{\akshay}[1]{{\color{blue} {\bf Akshay:} #1}}
-\newcommand{\yoav}[1]{{\color{green} {\bf Yoav:} #1}}
+%\newcommand{\comment}[3]{{\color{#1} {\bf #2 :} #3}}
+\newcommand{\comment}[3]{}  % suppress comments
+\newcommand{\shay}[1]{\comment{purple}{Shay}{#1}}
+\newcommand{\akshay}[1]{\comment{blue}{Akshay}{#1}}
+\newcommand{\yoav}[1]{\comment{green}{Yoav}{#1}}
+\newcommand{\sanjoy}[1]{\comment{orange}{Sanjoy}{#1}}
+
 \title{An adaptive nearest neighbor rule for classification}
 
 \begin{document}
@@ -54,19 +57,66 @@
 
 \section{Introduction}
 
-We introduce an adaptive nearest neighbor classification rule. Given a training set with labels $\{-1,1\}$ and a query point $x$, it makes a prediction based on the training points closest to $x$, rather like the $k$-nearest neighbor rule. However, the value of $k$ that it uses can vary from query to query. Specifically, if there are $n$ training points, then for any query $x$, the smallest $k$ is sought for which the $k$ points closest to $x$ have labels whose average is either greater than $+\Delta(n,k)$, in which case the prediction is $1$, or less than $- \Delta(n,k)$, in which case the prediction is $-1$; and if no such $k$ exists, then the label "?" us output, which corresponds to "label unknown". 
-Here $\Delta(n,k) \sim \sqrt{(\log n)/k}$ corresponds to a confidence interval for the average label in the region around the query.
+We introduce an adaptive nearest neighbor classification rule. Given a
+training set with labels $\{-1,1\}$ and a query point $x$, it makes a
+prediction based on the training points closest to $x$, rather like
+the $k$-nearest neighbor rule. However, the value of $k$ that it uses
+can vary from query to query. Specifically, if there are $n$ training
+points, then for any query $x$, the smallest $k$ is sought for which
+the $k$ points closest to $x$ have labels whose average is either
+greater than $+\Delta(n,k)$, in which case the prediction is $1$, or
+less than $- \Delta(n,k)$, in which case the prediction is $-1$; and
+if no such $k$ exists, then the label "?" us output, which corresponds
+to "label unknown".  Here $\Delta(n,k) \sim \sqrt{(\log n)/k}$
+corresponds to a confidence interval for the average label in the
+region around the query.
 
-We study this rule in the standard framework in which all data are i.i.d.\ draws from some unknown underlying distribution $P$ on $\X \times \Y$, where $\X$ is the data space and $\Y$ is the label space. We take $\X$ to be a separable metric space, with distance function $d: \X \times \X \rightarrow \R$, and we take $\Y = \{-1,+1\}$. 
-\yoav{We have two variants. The one described here, which only assumes a metric space, and the one in which we assume a euclidean space. The first is more general, the second is needed for active learning. I suggest we write the paper for case 1, and add a section at the end regarding case 2.}
-\shay{Note that in the second one, where we assume a low VC dimension of the entire family of balls also allow for a faster rate (I believe that the assumptions we pick will yield a logarithmic rate in $1/\delta$). Therefore, if we also wish to discuss rates of convergence in this paper then we should consider including it.}
-We can decompose $P$ into the marginal distribution $\mu$ on $\X$ and the conditional expectation of the label at each point $x$: if $(X,Y)$ represents a random draw from $P$, define $\eta(x) = \E(Y| X = x)$. In this terminology, the Bayes-optimal classifier is the rule $g^*: \X \rightarrow \{-1,+1\}$ given by
+We study this rule in the standard framework in which all data are
+i.i.d.\ draws from some unknown underlying distribution $P$ on $\X
+\times \Y$, where $\X$ is the data space and $\Y$ is the label
+space. We take $\X$ to be a separable metric space, with distance
+function $d: \X \times \X \rightarrow \R$, and we take $\Y =
+\{-1,+1\}$.  \yoav{We have two variants. The one described here, which
+  only assumes a metric space, and the one in which we assume a
+  euclidean space. The first is more general, the second is needed for
+  active learning. I suggest we write the paper for case 1, and add a
+  section at the end regarding case 2.}  \shay{Note that in the second
+  one, where we assume a low VC dimension of the entire family of
+  balls also allow for a faster rate (I believe that the assumptions
+  we pick will yield a logarithmic rate in $1/\delta$). Therefore, if
+  we also wish to discuss rates of convergence in this paper then we
+  should consider including it.}  We can decompose $P$ into the
+marginal distribution $\mu$ on $\X$ and the conditional expectation of
+the label at each point $x$: if $(X,Y)$ represents a random draw from
+$P$, define $\eta(x) = \E(Y| X = x)$. In this terminology, the
+Bayes-optimal classifier is the rule $g^*: \X \rightarrow \{-1,+1\}$
+given by
 $$ g^*(x) = \sign(\eta(x)) $$
 and its error rate is $R^* = \frac{1}{2}\E_{X \sim \mu} \left[1-|\mu(X)| \right]$. A variety of nonparametric classification schemes are known to have error rates that converge asymptotically to $R^*$. These include $k$-nearest neighbor (henceforth, $k$-NN) rules in which $k$ grows with the number of training points $n$ according to a suitable schedule $(k_n)$, under certain technical conditions on the metric measure space $(\X, d, \mu)$.
 
-In this paper, we are interested in consistency as well as rates of convergence. In particular, we find that the adaptive nearest neighbor rule is also asymptotically consistent (under the same technical conditions) while converging at a rate that is at least as good as, and in some cases better than, that of $k$-NN under any schedule $(k_n)$.
+In this paper, we are interested in consistency as well as rates of
+convergence. In particular, we find that the adaptive nearest neighbor
+rule is also asymptotically consistent (under the same technical
+conditions) while converging at a rate that is at least as good as,
+and in many natural cases significantly better than that of $k$-NN
+under any schedule $(k_n)$.
 
-Intuitively, one of the advantages of $k$-NN over nonparametric classifiers that use a fixed bandwidth or radius, such as Parzen window or kernel density estimators, is that $k$-NN automatically adapts to variation in the marginal distribution $\mu$: in regions with large $\mu$, the $k$ nearest neighbors lie close to the query point, while in regions with small $\mu$, the $k$ nearest neighbors can be further afield. The adaptive NN rule that we propose goes further: it also adapts to variation in $\eta$. In certain regions of the input space, where $\eta$ is close to $1/2$, an accurate prediction would need large $k$. In other regions, where $\eta$ is near 0 or 1, a small $k$ would suffice, and in fact, a larger $k$ might be detrimental because neighboring regions might be labeled differently. See Figure~\ref{fig:rationale} for one such example. A $k$-NN classifier is forced to pick a single value of $k$ that trades off between these two contingencies. Our adaptive NN rule, however, can pick the right $k$ in each neighborhood separately.
+Intuitively, one of the advantages of $k$-NN over nonparametric
+classifiers that use a fixed bandwidth or radius, such as Parzen
+window or kernel density estimators, is that $k$-NN automatically
+adapts to variation in the marginal distribution $\mu$: in regions
+with large $\mu$, the $k$ nearest neighbors lie close to the query
+point, while in regions with small $\mu$, the $k$ nearest neighbors
+can be further afield. The adaptive NN rule that we propose goes
+further: it also adapts to variation in $\eta$. In certain regions of
+the input space, where $\eta$ is close to $1/2$, an accurate
+prediction would need large $k$. In other regions, where $\eta$ is
+near 0 or 1, a small $k$ would suffice, and in fact, a larger $k$
+might be detrimental because neighboring regions might be labeled
+differently. See Figure~\ref{fig:rationale} for one such example. A
+$k$-NN classifier is forced to pick a single value of $k$ that trades
+off between these two contingencies. Our adaptive NN rule, however,
+can pick the right $k$ in each neighborhood separately.
 
 \begin{figure}
 \begin{center}
@@ -76,33 +126,141 @@ Intuitively, one of the advantages of $k$-NN over nonparametric classifiers that
 \label{fig:rationale}
 \end{figure}
 
+{\bf Yoav:} I would add to this figure something to indicate that
+points that are far from the boundary converge faster.
 
-\section{An adaptive nearest neighbor rule}
+\section{Setup}
 
-Let $(\X,d)$ be a separable metric space and let $\Y = \{-1,1\}$. Suppose we are given a labeled data set $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)}) \in \X \times \Y$.
+Let $(\X, d)$ be a separable metric space and let $\Y =
+\{-1,1\}$. There is a fixed but unknown distribution $P$ over $\X \times \Y$.
 
-For any set $S \subset \X$, define the empirical mass of $S$ to be
+Let $S$ be a measurable subset of $\X$.
+Define $\mu$ to be the probability of $S$ under $P$, that is,
+$$ \mu(S) = \pr(X \in S) $$
+Let $x \in \X$ be an input point $x \in \X$. Define 
+$$ \eta(x) = \E(Y| X = x)$$ as the conditional expectation, or the
+{\em bias}  of $Y$ given $x$.
+Similarly, for any measureable set $S$ let $\eta(S)$ denote the
+conditional expectation of $Y$ given $X \in S$:
+$$ \eta(S) = \E(Y| X \in S) = \frac{1}{\mu(S)} \int_S \eta(x) \ d \mu(x) .$$
+
+The analysis of \algname\ for a point $x \in X$ is based on balls centered
+at $x$ $$ B(x,r) = \{ y \in \X \mbox{ s.t. } d(x,y) \leq r \} $$.
+
+To prevent division by zero we define the support of {\em bias} $\mu$ to be
+$$ \supp(\mu) = \{x \in \X: \mbox{$\mu(B(x,r)) > 0$ for all $r > 0$}\} .$$
+
+\algname  converges quickly for points that are far
+from the decision boundary. In other words, for points $x$ that are
+the center of a large probability ball $B(x,r)$ whose conditional bias
+is the same as the conditional bias given $x$.
+
+\section{The adaptive $k$-NN algorithm}
+We assume the algorithm is given a labeled training set
+$(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)}) \in \X \times \Y$
+chosen IID according to the distribution $P$.
+
+Using the training set, the algorithm can compute empirical estimates of the
+probabilities and biases of different balls.
+
+Given $x \in \X$ we define $r_k(x)$ to be the distance between $x$ and
+it's $k$'th closest neighbor. We define $B_k(x)$ to be the ball,
+centered at $x$ that contains the $k$ nearest neighbors. We say that
+the empirical mass of $B_k(x)$ is $\mu_n(B_k(x)) = k/n$.
+
+We define the {\em empirical bias} of $B_k(x)$ as
 \begin{equation}
-\mu_n(S) = \frac{\lvert \{x^{(i)} \in S\}\rvert}{n} ,
-\label{eq:empirical-mass}
-\end{equation}
-and define the empirical label bias of $S$ as
-\begin{equation}
-\bias_n(S) = \frac{\lvert\{x^{(i)} \in S: y^{(i)} = 1\}\rvert}{\lvert \{x^{(i)} \in S\}\rvert} - \frac{1}{2} = \frac{\lvert\{x^{(i)} \in S: y^{(i)} = 1\}\rvert}{n\mu_n(S)} - \frac{1}{2}.
+  \eta_n(B_k(x))
+  = \frac{\sum_{i:x^{(i)} \in B_k(x)} y^{(i)}}{k}
 \label{eq:empirical-bias}
 \end{equation}
 
-Let $0 < \delta < 1$ be any pre-specified confidence parameter. Given a query point $x$, we make a prediction $\{0,1,?\}$, where $?$ denotes ``don't know'', according to the following rule:
+The algorithm recieves as input a confidence parameter $0 < \delta <1$.
+
+Given a point $x$, the algorithm make a prediction $\{0,1,?\}$  according to the following rule:
+
 \begin{itemize}
-\item Find the smallest ball $B$ centered at $x$ whose empirical bias has absolute value at least
-$$ \Delta(n,k,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{k}}, $$
+\item Find the smallest $n \leq k>0$ for which the ball $B_k(x)$ has a
+  {\em significant margin}, i.e. such that $\left|\eta_n(B_k(x))\right| > \Delta(n,k,\delta)$
+  Where
+  $$ \Delta(n,k,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{k}}, $$
 where $k$ is the number of points $x^{(i)}$ in $B$. The constant $c_1$ is from Lemma~\ref{lemma:bias} below.
 \shay{I presume $d_0$ denotes the VC dimension of the family of all balls? 
 $d_0$ should be set to $1$ in the case of the ``expected-case'' analysis}
 \yoav{I suggest we push $d_0$ to the end of the paper}
-\item If no such ball exists: predict ?. Otherwise, predict the majority label in $B$.
+\item If there exists such a ball, return $\sign(\eta_n(B_k(x)))$.
+\item If no such ball exists: predict ?
 \end{itemize}
 Let $g_n: \X \rightarrow \{0,1,?\}$ denote this classifier.
+
+\section{Universal consistency}
+\label{sec:universal-consistency}
+In this section we should that $g_n$ converges the the Bayes rule as
+$n \ to \infty$.
+
+
+\section{Interior and boundary sets}
+Following ~\cite{} we define the interior and boundary sets for \algname.
+
+For any $x \in \supp(\mu)$ and $p > 0$, let $r_p(x)$ denote the
+smallest radius such that the probability mass of $B(x, r_p(x))$ is at
+least $p$:
+$$ r_p(x) = \inf \{r > 0: \mu(B(x,r)) \geq p \} .$$
+Then $\mu(B(x,r_p(x))) \geq p$.
+
+Let $n$ be the size of the training set, let $1>\delta>0$ be a
+confidence parameter and let $y \in \{-1,+1\}$ be one of the two labels.
+
+The $y$ interior set $\X^y_{n,\delta}$ is set of points $x \in \supp(\mu)$, for which 
+there exists $p_x > 0$ such that:
+\begin{itemize}
+\item The correct prediction is $y$: $y \eta(x) > 0$
+\item $y \eta(B(x,r_{p_x}(x))) \geq c_2 \sqrt{\frac{\log (n/\delta)}{np_x}}$, where $c_2 = \max(2c_1, 1/2) \sqrt{1+c_0}$. 
+\item $y \eta(B(x,r)) \geq 0 $ for all $0 < r \leq r_{p_x}(x)$. 
+\end{itemize}
+
+The following Lemma shows that, with high probability, \ouralg makes
+the correct predictions on the interior points.
+\begin{lemma}
+Fix any $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$. Pick $n$
+training points at random from $P$. With probability at least
+$1-\delta^2$ over the choice of training data, the adaptive $k$-NN
+rule will predict 1 if $x \in \X^+_{n,\delta}$, or $-1$ if $x \in
+\X^-_{n,\delta}$.
+\label{lemma:good-sets}
+\end{lemma}
+
+Based on this result, it makes sense to define the {\it effective boundary} when there are $n$ data points as 
+$$ \partial_{n,\delta} = \X \setminus (\X^+_{n,\delta} \cup \X^-_{n,\delta}) .$$
+Then we have the following bound on the error rate of the adaptive nearest neighbor classifier.
+\begin{theorem}
+Pick any $0 < \delta < 1$. With probability at least $1-\delta$ over the choice of training points,
+$$ \pr_{X}(g_{n,\delta}(X) \neq g^*(X)) \ \leq \ \delta + \mu(\partial_{n,\delta}) .$$
+Here $g_{n,\delta}$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. \shay{The quantification over $\delta$ confuses me; note that the adaptive nearest neighbor classifier $g_{n,\delta}$ gets $\delta$ as an input (because the threshold $\Delta(n,k)$ does).} 
+\label{thm:general-error-bound}
+\end{theorem}
+
+It follows, using the same argument as in \cite{ChaudhuriDasgupta2014}, that the adaptive nearest neighbor rule is universally consistent as long as the metric space $(\X, d, \mu)$ satisfies Lebesgue's differentiation condition: that is, for any bounded measurable $f: \X \rightarrow \R$ and for $\mu$-almost\footnote{I.e., the set of points which does not satisfy the condition has measure $0$ under $\mu$.} every $x$,
+$$ \lim_{r \downarrow 0} \frac{1}{\mu(B(x,r))} \int_{B(x,r)} f \ d\mu = f(x) .$$
+This holds in any finite-dimensional normed space, or any doubling metric space.
+\shay{In order for consistency to hold, 
+one should tune $\delta= \delta(n)$ such that $\delta(n)\to_{n\to\infty} 0$.
+(note that $\delta$ is a parameter of our algorithm, unlike in \cite{ChaudhuriDasgupta2014}, where $\delta$
+was just defined for sake of analysis). }
+
+\section{Prediction margin}
+Most existing convergence rate results for KNN assume that $\mu(x)$ is
+a smooth function.
+
+In this work we prove convergence bounds on  \algname\ which do not
+require smoothness. Instead, the bounds depend on a pointwise quantity
+which we call the {\em prediction margin}. We say that a point $x \in \supp(\mu)$
+has margin $m(x)$ if there exists a radius $r(x)>0$ such that 
+\begin{enumerate}
+\item $$ \mu(B(x,r(x))) \eta(B(x,r(x)))^2 = m(x) $$
+\item for all $0<r'<r(x)$, $\sign(\eta(B(x,r))) = \sign(\eta(B(x,r(x))))$
+\end{enumerate}
+
 
 \section{Large deviation bounds}
 
@@ -113,12 +271,12 @@ $$ \eta(x) = \pr(Y = 1| X = x) .$$
 For measurable $S$, let $\eta(S)$ denote the average $\eta$-value, that is,
 $$ \eta(S) = \pr(Y = 1| X \in S) = \frac{1}{\mu(S)} \int_S \eta \ d \mu .$$
 
-Suppose we draw $n$ points $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_n(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
+Suppose we draw $n$ points $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_{n,\delta}(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 7]
 There is a universal constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
 $$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
 \ \ \implies \ \ 
-\mu_n(B) \geq \frac{k}{n} .$$
+\mu_{n,\delta}(B) \geq \frac{k}{n} .$$
 \label{lemma:points-in-balls}
 \end{lemma}
 
@@ -140,57 +298,6 @@ where $k(B) = |\{i: x^{(i)} \in B\}|$ is the number of points inside $B$ and
 \Cref{lemma:bias} is a special case of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
 that we present and prove in \Cref{sec:ucecm}.
 
-
-
-
-\section{Fine-grained analysis and universal consistency}
-\label{sec:universal-consistency}
-
-Define the support of the marginal distribution $\mu$ to be
-$$ \supp(\mu) = \{x \in \X: \mbox{$\mu(B(x,r)) > 0$ for all $r > 0$}\} .$$
-
-For any $x \in \supp(\mu)$ and $p > 0$, let $r_p(x)$ denote the smallest radius such that the probability mass of $B(x, r_p(x))$ is at least $p$:
-$$ r_p(x) = \inf \{r > 0: \mu(B(x,r)) \geq p \} .$$
-Then $\mu(B(x,r_p(x))) \geq p$.
-
-We now characterize the region of $\X$ that $\algname$ is likely to correctly classify as having label $1$, given $n$ training points. It is the set $\X^+_n$ of points $x \in \supp(\mu)$, with $\eta(x) > 1/2$, for which there exists $p_x > 0$ such that:
-\begin{itemize}
-\item $\eta(B(x,r_{p_x}(x))) \geq \frac{1}{2} + c_2 \sqrt{\frac{\log (n/\delta)}{np_x}}$, where $c_2 = \max(2c_1, 1/2) \sqrt{1+c_0}$. 
-\item $\eta(B(x,r)) \geq 1/2$ for all $0 < r \leq r_{p_x}(x)$. 
-\end{itemize}
-The set $\X^-_n$ can be defined symmetrically, as consisting of $x \in \supp(\mu)$ with $\eta(x) < 1/2$, and for which there exists $p_x > 0$ such that:
-\begin{itemize}
-\item $\eta(B(x,r_{p_x}(x))) \leq \frac{1}{2} - c_2 \sqrt{\frac{\log (n/\delta)}{np_x}}$. 
-\item $\eta(B(x,r)) \leq 1/2$ for all $0 < r \leq r_{p_x}(x)$. 
-\end{itemize}
-
-\begin{lemma}
-Fix any $x \in \X^+_n \cup \X^-_n$. Pick $n$ training points at random from $P$. With probability at least $1-\delta^2$ over the choice of training data, the adaptive $k$-NN rule will predict 1 if $x \in \X^+_n$, or $0$ if $x \in \X^-_n$.
-\label{lemma:good-sets}
-\end{lemma}
-
-
-Based on this result, it makes sense to define the {\it effective boundary} when there are $n$ data points as 
-$$ \partial_n = \X \setminus (\X^+_n \cup \X^-_n) .$$
-Then we have the following bound on the error rate of the adaptive nearest neighbor classifier.
-\begin{theorem}
-Pick any $0 < \delta < 1$. With probability at least $1-\delta$ over the choice of training points,
-$$ \pr_{X}(g_n(X) \neq g^*(X)) \ \leq \ \delta + \mu(\partial_n) .$$
-Here $g_n$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. \shay{The quantification over $\delta$ confuses me; note that the adaptive nearest neighbor classifier $g_n$ gets $\delta$ as an input (because the threshold $\Delta(n,k)$ does).} 
-\label{thm:general-error-bound}
-\end{theorem}
-
-
-It follows, using the same argument as in \cite{ChaudhuriDasgupta2014}, that the adaptive nearest neighbor rule is universally consistent as long as the metric space $(\X, d, \mu)$ satisfies Lebesgue's differentiation condition: that is, for any bounded measurable $f: \X \rightarrow \R$ and for $\mu$-almost\footnote{I.e., the set of points which does not satisfy the condition has measure $0$ under $\mu$.} every $x$,
-$$ \lim_{r \downarrow 0} \frac{1}{\mu(B(x,r))} \int_{B(x,r)} f \ d\mu = f(x) .$$
-This holds in any finite-dimensional normed space, or any doubling metric space.
-\shay{In order for consistency to hold, 
-one should tune $\delta= \delta(n)$ such that $\delta(n)\to_{n\to\infty} 0$.
-(note that $\delta$ is a parameter of our algorithm, unlike in \cite{ChaudhuriDasgupta2014}, where $\delta$
-was just defined for sake of analysis). }
-
-
-
 \section{High-probability convergence}
 
 In this section, we make a further assumption that allows us to strengthen \Cref{thm:general-error-bound}, tightly quantifying over all query points simultaneously. 
@@ -211,7 +318,7 @@ x \in \supp(\mu) : s \eta(x) > 0 , \exists p_x > 0 \text{ s.t. }
 \end{align*}
 where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_0}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
 Also define 
-$$ \partial_n (\delta) = \X \setminus (\X^+_n (\delta) \cup \X^-_n (\delta)) $$
+$$ \partial_n (\delta) = \X \setminus (\X^+_{n,\delta} (\delta) \cup \X^-_{n,\delta}) $$
 Then our main convergence rate result in this scenario shows that the measure of the effective boundary bounds the convergence of $\algname$.
 
 
@@ -831,14 +938,14 @@ that this probability is at most $\delta/2$.
 \section{Proofs}
 
 \begin{proof}[Proof of \Cref{lemma:good-sets}]
-Fix any $x \in \X^+_n$; the case of $x \in \X^-_n$ is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension 1. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
+Fix any $x \in \X^+_{n,\delta}$; the case of $x \in \X^-_{n,\delta}$ is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension 1. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
 \begin{enumerate}
 \item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
 \item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B))$.
 \end{enumerate}
 Assume henceforth that these hold.
 
-Let $p = p_x$ be as specified in the definition of $\X^+_n$. Set $k = np/(1 + c_0)$. We first observe that $k \geq \log (n/\delta)$. This is because the definition of $p$ implies $c_2 \sqrt{\log (n/\delta)/(np)} \leq 1/2$ and thus $np \geq 4 c_2^2 \log (n/\delta) \geq (1+c_0) \log (n/\delta)$.
+Let $p = p_x$ be as specified in the definition of $\X^+_{n,\delta}$. Set $k = np/(1 + c_0)$. We first observe that $k \geq \log (n/\delta)$. This is because the definition of $p$ implies $c_2 \sqrt{\log (n/\delta)/(np)} \leq 1/2$ and thus $np \geq 4 c_2^2 \log (n/\delta) \geq (1+c_0) \log (n/\delta)$.
 
 As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$. Thus, by property 1, the ball $B = B(x, r_p(x))$ has $\mu_n(B) \geq k/n$. This means, in turn, that by property 2,
 \begin{align*}
@@ -856,17 +963,17 @@ and thus no such ball will trigger a prediction of $0$. Therefore, the predictio
 
 
 \begin{proof}[Proof of \Cref{thm:general-error-bound}]
-From Lemma~\ref{lemma:good-sets}, we have that for any $x \in \X^+_n \cup \X^-_n$, 
+From Lemma~\ref{lemma:good-sets}, we have that for any $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$, 
 $$ \pr_n(g_n(x) \neq g^*(x)) \leq \delta^2 ,$$
 where $\pr_n$ denotes probability over the choice of training points. Thus, for $X \sim \mu$,
-$$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X^+_n \cup \X^-_n) \leq \delta^2 ,$$
+$$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X^+_{n,\delta} \cup \X^-_{n,\delta}) \leq \delta^2 ,$$
 and by Markov's inequality,
-$$ \pr_n [\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_n \cup \X^-_n) \geq \delta] \leq \delta.$$
+$$ \pr_n [\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_{n,\delta} \cup \X^-_{n,\delta}) \geq \delta] \leq \delta.$$
 Thus, with probability at least $1-\delta$ over the training set,
-$$\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_n \cup \X^-_n) \leq \delta$$
+$$\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_{n,\delta} \cup \X^-_{n,\delta}) \leq \delta$$
 and
 $$ \pr_X(g_n(X) \neq g^*(X)) 
-\ \leq \ \delta \ \pr(X \in \X^+_n \cup X^-_n) + \pr(X \not\in \X^+_n \cup \X^-_n)
+\ \leq \ \delta \ \pr(X \in \X^+_{n,\delta} \cup X^-_{n,\delta}) + \pr(X \not\in \X^+_{n,\delta} \cup \X^-_{n,\delta})
 \ \leq \ \delta + \mu(\partial_n) .$$
 \end{proof}
 
@@ -887,9 +994,9 @@ By \Cref{lemma:points-in-balls-2} and \Cref{lemma:bias}, we have that with proba
 \item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
 \item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B)) = c_1 \sqrt{\frac{\kappa_{n, \delta}}{n \mu_n(B)}}$
 \end{enumerate}
-Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_n (\delta) \cup \X^-_n (\delta)$ w.p. 1 under $\mu$. 
+Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_{n,\delta} (\delta) \cup \X^-_{n,\delta} (\delta)$ w.p. 1 under $\mu$. 
 
-This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_n (\delta)$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_n (\delta)$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
+This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta} (\delta)$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta} (\delta)$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
 \begin{align*}
 \bias_n(B) &\geq \bias(B) - \Delta(n, k(x) ) 
 \geq c_2 \sqrt{\frac{\kappa_{n, \delta}}{np}} - c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} 
@@ -901,7 +1008,7 @@ At the same time, for any ball $B' = B(x, r)$ with $r < r_{p(x)} (x)$,
 $$ \bias_n(B') \geq \bias(B') - \Delta(n, n \mu_n(B')) > -\Delta(n, n \mu_n(B')) $$
 and thus no such ball will trigger a prediction of $-1$. Therefore, the algorithm's prediction at $x$ must be $+1$.
 
-The argument for $x \in \X^-_n (\delta)$ proceeds exactly symmetrically. 
+The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically. 
 \end{proof}
 
 
