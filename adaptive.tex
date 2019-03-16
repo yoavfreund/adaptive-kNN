@@ -195,7 +195,7 @@ $d_0$ should be set to $1$ in the case of the ``expected-case'' analysis}
 Let $g_n: \X \rightarrow \{0,1,?\}$ denote this classifier.
 In the next sections we prove upper bounds on the rate at which  $g_n$ converges to $g$.
 
-\section{Pointwise Advantage}
+\section{Point-wise Advantage}
 
 \newcommand{\advantage}{\mbox{adv}}
 \newcommand{\opt}{\mbox{adv}^*}
@@ -222,52 +222,36 @@ We quantify the convergence rate of the ball $B(x,r)$ using the
 \advantage(B(x,r)) \doteq \mu(B(x,r)) \eta(B(x,r))^2
 \end{equation}
 
-We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_r \advantage(B(x,r))$.
+We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_r \advantage(B(x,r))$. Next, we show that the rate of convergence of \algname\ at the point $x$ is characterized by $\opt(x)$
 
-\iffalse
-Finally, for each $\epsilon>0$ we define the {\em $\epsilon$-optimal} ball for $x$ as the smallest ball
-whose advantage is $\epsilon$ close to the supremum.
-\[
-\eopt(x) = \min \left\{ 0<r\leq \rsupp \mbox{ s.t. } \advantage(B(x,r)) \geq
-\opt(x)-\epsilon \right\}
-\]
-\yoavv{I wish I could get rid of this epsilon, but I think the
-  supremum is not always achieved.}
-\fi
+\section{Convergence bounds}
 
-\iffalse
-The optimal advantage $\opt(x)$ determines the rate of convrgence of
-\algname\ at $x$. 
 
-The $y$ interior set $\X^y_{n,\delta}$ is set of points $x \in \supp(\mu)$, for which 
-there exists $p_x > 0$ such that:
-\begin{itemize}
-\item The correct prediction is $y$: $y \eta(x) > 0$
-\item $y \eta(B(x,r_{p_x}(x))) \geq c_2 \sqrt{\frac{\log (n/\delta)}{np_x}}$, where $c_2 = \max(2c_1, 1/2) \sqrt{1+c_0}$. 
-\item $y \eta(B(x,r)) \geq 0 $ for all $0 < r \leq r_{p_x}(x)$. 
-\end{itemize}
-
-The following Lemma shows that, with high probability, \algname\ makes
-the correct predictions on the interior points.
-\begin{lemma}
-Fix any $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$. Pick $n$
-training points at random from $P$. With probability at least
-$1-\delta^2$ over the choice of training data, the adaptive $k$-NN
-rule will predict 1 if $x \in \X^+_{n,\delta}$, or $-1$ if $x \in
-\X^-_{n,\delta}$.
-\label{lemma:good-sets}
-\end{lemma}
-
-Based on this result, it makes sense to define the {\it effective boundary} when there are $n$ data points as 
-$$ \partial_{n,\delta} = \X \setminus (\X^+_{n,\delta} \cup \X^-_{n,\delta}) .$$
-Then we have the following bound on the error rate of the adaptive nearest neighbor classifier.
-\begin{theorem}
-Pick any $0 < \delta < 1$. With probability at least $1-\delta$ over the choice of training points,
-$$ \pr_{X}(g_{n,\delta}(X) \neq g^*(X)) \ \leq \ \delta + \mu(\partial_{n,\delta}) .$$
-Here $g_{n,\delta}$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. \shay{The quantification over $\delta$ confuses me; note that the adaptive nearest neighbor classifier $g_{n,\delta}$ gets $\delta$ as an input (because the threshold $\Delta(n,k)$ does).} 
-\label{thm:general-error-bound}
+The First theorem holds for any separable metric space.
+\begin{theorem} [Point-wise convergence rate]
+Fix a point $x \in \supp(\mu)$ and a confidence parameter $\delta>0$. If the size of the training set satisfies
+$$ n > \frac{C}{\opt(x)} \log \frac{n}{\delta}$$
+then he probability that \ouralg\ predict the label of $x$ incorrectly is smaller than $\delta$. Where $C$ is a universal constant.
 \end{theorem}
 
+
+The second theorem has the additional requirement that the VC-dim of the balls is bounded by $d$.
+
+Define the set of points with optimal advantage at least $\alpha$ as
+$$ \X_\alpha = \left\{ x \in \supp(\mu) \mbox{ such that } \opt(x) \geq \alpha \right\} $$
+
+We can prove uniform convergence over $\X_\alpha$:
+
+\begin{theorem} [Uniform convergence rate]
+Fix a confidence parameter $\delta>0$. If the size of the training set satisfies
+$$ n > \frac{C}{\alpha} d \log \frac{n}{\delta}$$
+then he probability that \ouralg\ predict the label of $x$ incorrectly for {\em any} $x \in \X_\alpha$ is smaller than $\delta$. Where $C$ is a universal constant.
+\end{theorem}
+
+
+
+
+\section{Convergence of the probability of the balls}
 It follows, using the same argument as in \cite{ChaudhuriDasgupta2014}, that the adaptive nearest neighbor rule is universally consistent as long as the metric space $(\X, d, \mu)$ satisfies Lebesgue's differentiation condition: that is, for any bounded measurable $f: \X \rightarrow \R$ and for $\mu$-almost\footnote{I.e., the set of points which does not satisfy the condition has measure $0$ under $\mu$.} every $x$,
 $$ \lim_{r \downarrow 0} \frac{1}{\mu(B(x,r))} \int_{B(x,r)} f \ d\mu = f(x) .$$
 This holds in any finite-dimensional normed space, or any doubling metric space.
@@ -275,7 +259,7 @@ This holds in any finite-dimensional normed space, or any doubling metric space.
 one should tune $\delta= \delta(n)$ such that $\delta(n)\to_{n\to\infty} 0$.
 (note that $\delta$ is a parameter of our algorithm, unlike in \cite{ChaudhuriDasgupta2014}, where $\delta$
 was just defined for sake of analysis). }
-\fi 
+
 
 
 \section{Large deviation bounds}
