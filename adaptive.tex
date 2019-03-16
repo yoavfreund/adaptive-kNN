@@ -193,43 +193,36 @@ $d_0$ should be set to $1$ in the case of the ``expected-case'' analysis}
 \item If no such ball exists: predict ?
 \end{itemize}
 Let $g_n: \X \rightarrow \{0,1,?\}$ denote this classifier.
-
-\section{Universal consistency}
-\label{sec:universal-consistency}
-In this section we should that $g_n$ converges the the Bayes rule as
-$n \to \infty$.
-
+In the next sections we prove upper bounds on the rate at which  $g_n$ converges to $g$.
 
 \section{Pointwise Advantage}
 
 \newcommand{\advantage}{\mbox{adv}}
-\newcommand{\opt}{\mbox{Opt}}
+\newcommand{\opt}{\mbox{adv}^*}
 \newcommand{\eopt}{\epsilon \mbox{-Opt}}
 
-In this section we define the optimal advantage $\opt(x)$ which
+In this section we define a  function $\opt(x)$ which
 characterizes the convergence rate of \algname\ at the point $x$.
 
-Let $x \in \supp(\mu)$ and assume $\mu(x) \neq 0$. Define the sign of
-$x$ to be $s(x) \doteq \sign(\eta(x))$.
+Let $x \in \supp(\mu)$ and assume $\mu(x) \neq 0$. Define the sign of $x$ to be $s(x) \doteq \sign(\eta(x))$.
 
-\newcommand{\rsupp}{r_{\mbox{supp}}}
-Define the support of $x$ to be range of small balls that agree with
-the sign of $x$:
+\newcommand{\rconsist}{r_c}
+We define the {\em consistency radius} for the point $x$ to be the largest radius how bias is consistent with the sign of $x$:
 \begin{equation}
-\rsupp = \sup \left\{ r>0 \mbox{ s.t. } \forall r' \leq r \mbox{ and } \sign(\eta(B(x,r')))
+\rconsist(x) = \sup \left\{ r>0 \mbox{ s.t. } \forall r' \leq r \mbox{ and } \sign(\eta(B(x,r')))
   =  s(x) \right\}
 \end{equation}
 
-The majority vote for each ball of radius $0 \leq r \leq r'$ converges
-to the correct label as the size of the training set grows. However,
-some balls will converge faster than others.
+The majority vote for each ball $B(r,x)$ $0 \leq r \leq \rconsist(x)$ converges to the correct label 
+as the size of the training set grows. We now characterize the rate of this convergence.
+
 We quantify the convergence rate of the ball $B(x,r)$ using the
 {\em advantage} of the ball which we define as
 \begin{equation}
 \advantage(B(x,r)) \doteq \mu(B(x,r)) \eta(B(x,r))^2
 \end{equation}
 
-We define the optimal advantage for $x$ to be $\opt(x)= \sup_r \advantage(B(x,r))$
+We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_r \advantage(B(x,r))$.
 
 \iffalse
 Finally, for each $\epsilon>0$ we define the {\em $\epsilon$-optimal} ball for $x$ as the smallest ball
@@ -321,6 +314,10 @@ where $k(B) = |\{i: x^{(i)} \in B\}|$ is the number of points inside $B$ and
 \Cref{lemma:bias} is a special case of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
 that we present and prove in \Cref{sec:ucecm}.
 
+\section{Universal consistency}
+\label{sec:universal-consistency}
+In this section we show that $g_n$ converges the the Bayes rule as
+$n \to \infty$.
 \section{High-probability convergence}
 
 In this section, we make a further assumption that allows us to strengthen \Cref{thm:general-error-bound}, tightly quantifying over all query points simultaneously. 
@@ -1017,9 +1014,9 @@ By \Cref{lemma:points-in-balls-2} and \Cref{lemma:bias}, we have that with proba
 \item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
 \item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B)) = c_1 \sqrt{\frac{\kappa_{n, \delta}}{n \mu_n(B)}}$
 \end{enumerate}
-Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_{n,\delta} (\delta) \cup \X^-_{n,\delta} (\delta)$ w.p. 1 under $\mu$. 
+Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$ w.p. 1 under $\mu$. 
 
-This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta} (\delta)$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta} (\delta)$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
+This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta}$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta}$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
 \begin{align*}
 \bias_n(B) &\geq \bias(B) - \Delta(n, k(x) ) 
 \geq c_2 \sqrt{\frac{\kappa_{n, \delta}}{np}} - c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} 
