@@ -229,9 +229,9 @@ We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_r \advantage(
 
 The First theorem holds for any separable metric space.
 \begin{theorem} [Point-wise convergence rate]
-Fix a point $x \in \supp(\mu)$ and a confidence parameter $\delta>0$. If the size of the training set satisfies
+Fix a point $x \in \supp(\mu)$ and a confidence parameter $\delta>0$. If the size of the training set satisfies   
 $$ n > \frac{C}{\opt(x)} \log \frac{n}{\delta}$$
-then he probability that \ouralg\ predict the label of $x$ incorrectly is smaller than $\delta$. Where $C$ is a universal constant.
+then he probability that \algname\ predict the label of $x$ incorrectly is smaller than $\delta$. Where $C$ is a universal constant.
 \end{theorem}
 
 
@@ -245,7 +245,7 @@ We can prove uniform convergence over $\X_\alpha$:
 \begin{theorem} [Uniform convergence rate]
 Fix a confidence parameter $\delta>0$. If the size of the training set satisfies
 $$ n > \frac{C}{\alpha} d \log \frac{n}{\delta}$$
-then he probability that \ouralg\ predict the label of $x$ incorrectly for {\em any} $x \in \X_\alpha$ is smaller than $\delta$. Where $C$ is a universal constant.
+then he probability that \algname\ predict the label of $x$ incorrectly for {\em any} $x \in \X_\alpha$ is smaller than $\delta$. Where $C$ is a universal constant.
 \end{theorem}
 
 
