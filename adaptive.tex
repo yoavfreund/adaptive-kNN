@@ -123,7 +123,8 @@ can pick the right $k$ in each neighborhood separately.
 \begin{center}
 \includegraphics[width=3in]{adaptive-rationale.pdf}
 \end{center}
-\caption{For values of $x$ on the left half of the shown interval, the conditional probability function $\eta(x)$ is close to 0 or 1, and thus a small value of $k$ will yield an accurate prediction. Larger $k$ will not do as well, because they may run into neighboring regions with different labels. For values of $x$ on the right half of the interval, $\eta(x)$ is close to $1/2$, and thus large $k$ is essential for accurate prediction.}
+\caption{For values of $x$ on the left half of the shown interval, the
+  pointwise bias $\eta(x)$ is close to -1 or 1, and thus a small value of $k$ will yield an accurate prediction. Larger $k$ will not do as well, because they may run into neighboring regions with different labels. For values of $x$ on the right half of the interval, $\eta(x)$ is close to $0$, and thus large $k$ is essential for accurate prediction.}
 \label{fig:rationale}
 \end{figure}
 
@@ -151,10 +152,11 @@ at $x$ $$ B(x,r) = \{ y \in \X \mbox{ s.t. } d(x,y) \leq r \} $$.
 To prevent division by zero we define the support of {\em bias} $\mu$ to be
 $$ \supp(\mu) = \{x \in \X: \mbox{$\mu(B(x,r)) > 0$ for all $r > 0$}\} .$$
 
-\algname  converges quickly for points that are far
+\algname\  converges quickly for points that are far
 from the decision boundary. In other words, for points $x$ that are
-the center of a large probability ball $B(x,r)$ whose conditional bias
-is the same as the conditional bias given $x$.
+the center of a ball $B(x,r)$ which has significant probability and
+significant bias, and that the sign of the bias agrees with the bias
+at $x$.
 
 \section{The adaptive $k$-NN algorithm}
 We assume the algorithm is given a labeled training set
@@ -204,17 +206,20 @@ In the next sections we prove upper bounds on the rate at which  $g_n$ converges
 In this section we define a  function $\opt(x)$ which
 characterizes the convergence rate of \algname\ at the point $x$.
 
-Let $x \in \supp(\mu)$ and assume $\mu(x) \neq 0$. Define the sign of $x$ to be $s(x) \doteq \sign(\eta(x))$.
+It follows from~\cite{ChaudhuriDasgupta2014} that, under the Lsbeque
+differentiation condition that for almost all $x$ there exists a radius
+$r>0$ such that $\sign(\bias(B(x,r))=s(x)$.
 
 \newcommand{\rconsist}{r_c}
-We define the {\em consistency radius} for the point $x$ to be the largest radius how bias is consistent with the sign of $x$:
+
+For this probability one set of points we 
+define the {\em consistency radius} $\rconsist(x)$ to be the 
+{\bf largest} radius  bias is consistent with the sign of $x$:
 \begin{equation}
-\rconsist(x) = \sup \left\{ r>0 \mbox{ s.t. } \forall r' \leq r \mbox{ and } \sign(\eta(B(x,r')))
+\rconsist(x) = \sup \left\{ r>0 \mbox{ s.t. } \forall r' \leq r, \;\sign(\eta(B(x,r')))
   =  s(x) \right\}
 \end{equation}
 
-The majority vote for each ball $B(r,x)$ $0 \leq r \leq \rconsist(x)$ converges to the correct label 
-as the size of the training set grows. We now characterize the rate of this convergence.
 
 We quantify the convergence rate of the ball $B(x,r)$ using the
 {\em advantage} of the ball which we define as
@@ -222,10 +227,10 @@ We quantify the convergence rate of the ball $B(x,r)$ using the
 \advantage(B(x,r)) \doteq \mu(B(x,r)) \eta(B(x,r))^2
 \end{equation}
 
-We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_r \advantage(B(x,r))$. Next, we show that the rate of convergence of \algname\ at the point $x$ is characterized by $\opt(x)$
+We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_{r \leq r_c(x)} \advantage(B(x,r))$.
+Next, we show that the rate of convergence of \algname\ at the point $x$ is characterized by $\opt(x)$
 
 \section{Convergence bounds}
-
 
 The First theorem holds for any separable metric space.
 \begin{theorem} [Point-wise convergence rate]
