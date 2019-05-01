@@ -1,10 +1,34 @@
 \documentclass{article}
-\usepackage{fullpage}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+     \usepackage[final]{neurips_2019}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
-\usepackage{natbib}
 \usepackage[colorinlistoftodos]{todonotes}
-\usepackage{hyperref}
 \usepackage{amsthm}
 \usepackage{cleveref}
 
@@ -22,6 +46,7 @@
 \def\B{{\mathcal B}}
 \def\bias{{\rm bias}}
 \def\supp{{\rm supp}}
+\def\adv{{\rm adv}}
 
 \newcommand{\cB}{\mathcal{B}}
 \newcommand{\I}{\mathcal{I}}
@@ -30,6 +55,7 @@
 \newcommand{\eps}{\epsilon}
 \newcommand{\sign}{\mbox{sign}}
 \newcommand{\algname}{\textsc{AKNN}}
+
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -42,8 +68,8 @@
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-%\newcommand{\comment}[3]{{\color{#1} {\bf #2 :} #3}}
-\newcommand{\comment}[3]{}  % suppress comments
+\newcommand{\comment}[3]{{\color{#1} {\bf #2 :} #3}}
+%\newcommand{\comment}[3]{}  % suppress comments
 \newcommand{\shay}[1]{\comment{purple}{Shay}{#1}}
 \newcommand{\akshay}[1]{\comment{blue}{Akshay}{#1}}
 \newcommand{\yoav}[1]{\comment{green}{Yoav}{#1}}
@@ -52,6 +78,19 @@
 
 \title{An adaptive nearest neighbor rule for classification}
 
+\author{
+Akshay Balsubramani \\
+\texttt{abalsubr@stanford.edu} \\
+\And
+Sanjoy Dasgupta \\
+\texttt{dasgupta@eng.ucsd.edu} \\
+\And
+Yoav Freund \\
+\texttt{yfreund@eng.ucsd.edu} \\
+\And
+Shay Moran\\
+\texttt{shaymoran1@gmail.com} \\
+}
 \begin{document}
 
 \maketitle
@@ -59,47 +98,43 @@
 \section{Introduction}
 
 We introduce an adaptive nearest neighbor classification rule. Given a
-training set with labels $\{-1,1\}$ and a query point $x$, it makes a
-prediction based on the training points closest to $x$, rather like
+training set with labels $\{-1,+1\}$, its prediction at a query point $x$ is based on the training points closest to $x$, rather like
 the $k$-nearest neighbor rule. However, the value of $k$ that it uses
 can vary from query to query. Specifically, if there are $n$ training
 points, then for any query $x$, the smallest $k$ is sought for which
 the $k$ points closest to $x$ have labels whose average is either
-greater than $+\Delta(n,k)$, in which case the prediction is $1$, or
+greater than $+\Delta(n,k)$, in which case the prediction is $+1$, or
 less than $- \Delta(n,k)$, in which case the prediction is $-1$; and
-if no such $k$ exists, then the label "?" us output, which corresponds
-to "label unknown".  Here $\Delta(n,k) \sim \sqrt{(\log n)/k}$
-corresponds to a confidence interval for the average label in the
-region around the query.
+if no such $k$ exists, then ``?'' (``don't know'') is output.  Here $\Delta(n,k) \sim \sqrt{(\log n)/k}$ corresponds to a confidence interval for the average label in the region around the query.
 
-We study this rule in the standard framework in which all data are
+We study this rule in the standard statistical framework in which all data are
 i.i.d.\ draws from some unknown underlying distribution $P$ on $\X
 \times \Y$, where $\X$ is the data space and $\Y$ is the label
 space. We take $\X$ to be a separable metric space, with distance
 function $d: \X \times \X \rightarrow \R$, and we take $\Y =
-\{-1,+1\}$.  \yoav{We have two variants. The one described here, which
-  only assumes a metric space, and the one in which we assume a
-  euclidean space. The first is more general, the second is needed for
-  active learning. I suggest we write the paper for case 1, and add a
-  section at the end regarding case 2.}  \shay{Note that in the second
-  one, where we assume a low VC dimension of the entire family of
-  balls also allow for a faster rate (I believe that the assumptions
-  we pick will yield a logarithmic rate in $1/\delta$). Therefore, if
-  we also wish to discuss rates of convergence in this paper then we
-  should consider including it.}  We can decompose $P$ into the
+\{-1,+1\}$. We can decompose $P$ into the
 marginal distribution $\mu$ on $\X$ and the conditional expectation of
 the label at each point $x$: if $(X,Y)$ represents a random draw from
 $P$, define $\eta(x) = \E(Y| X = x)$. In this terminology, the
 Bayes-optimal classifier is the rule $g^*: \X \rightarrow \{-1,+1\}$
 given by
-$$ g^*(x) = \sign(\eta(x)) $$
-and its error rate is $R^* = \frac{1}{2}\E_{X \sim \mu} \left[1-|\mu(X)| \right]$. A variety of nonparametric classification schemes are known to have error rates that converge asymptotically to $R^*$. These include $k$-nearest neighbor (henceforth, $k$-NN) rules in which $k$ grows with the number of training points $n$ according to a suitable schedule $(k_n)$, under certain technical conditions on the metric measure space $(\X, d, \mu)$.
+\begin{equation}
+g^*(x) = 
+\left\{
+\begin{array}{ll}
+\sign(\eta(x)) & \mbox{if $\eta(x) \neq 0$} \\
+\mbox{either $-1$ or $+1$} & \mbox{if $\eta(x) = 0$}
+\end{array}
+\right.
+\label{eq:bayes-opt}
+\end{equation}
+and its error rate is the Bayes risk, $R^* = \frac{1}{2}\E_{X \sim \mu} \left[1-|\eta(X)| \right]$. A variety of nonparametric classification schemes are known to have error rates that converge asymptotically to $R^*$. These include $k$-nearest neighbor (henceforth, $k$-NN) rules~\cite{FH51} in which $k$ grows with the number of training points $n$ according to a suitable schedule $(k_n)$, under certain technical conditions on the metric measure space $(\X, d, \mu)$.
 
 In this paper, we are interested in consistency as well as rates of
 convergence. In particular, we find that the adaptive nearest neighbor
 rule is also asymptotically consistent (under the same technical
 conditions) while converging at a rate that is at least as good as,
-and in many natural cases significantly better than that of $k$-NN
+and sometimes significantly better than, that of $k$-NN
 under any schedule $(k_n)$.
 
 Intuitively, one of the advantages of $k$-NN over nonparametric
@@ -110,9 +145,9 @@ with large $\mu$, the $k$ nearest neighbors lie close to the query
 point, while in regions with small $\mu$, the $k$ nearest neighbors
 can be further afield. The adaptive NN rule that we propose goes
 further: it also adapts to variation in $\eta$. In certain regions of
-the input space, where $\eta$ is close to $1/2$, an accurate
+the input space, where $\eta$ is close to $0$, an accurate
 prediction would need large $k$. In other regions, where $\eta$ is
-near 0 or 1, a small $k$ would suffice, and in fact, a larger $k$
+near $-1$ or $1$, a small $k$ would suffice, and in fact, a larger $k$
 might be detrimental because neighboring regions might be labeled
 differently. See Figure~\ref{fig:rationale} for one such example. A
 $k$-NN classifier is forced to pick a single value of $k$ that trades
@@ -124,177 +159,245 @@ can pick the right $k$ in each neighborhood separately.
 \includegraphics[width=3in]{adaptive-rationale.pdf}
 \end{center}
 \caption{For values of $x$ on the left half of the shown interval, the
-  pointwise bias $\eta(x)$ is close to -1 or 1, and thus a small value of $k$ will yield an accurate prediction. Larger $k$ will not do as well, because they may run into neighboring regions with different labels. For values of $x$ on the right half of the interval, $\eta(x)$ is close to $0$, and thus large $k$ is essential for accurate prediction.}
+  pointwise bias $\eta(x)$ is close to $-1$ or $1$, and thus a small value of $k$ will yield an accurate prediction. Larger $k$ will not do as well, because they may run into neighboring regions with different labels. For values of $x$ on the right half of the interval, $\eta(x)$ is close to $0$, and thus large $k$ is essential for accurate prediction.}
 \label{fig:rationale}
 \end{figure}
+
+Our estimator allows us to give rates of convergence that are tighter and more 
+transparent than those customarily obtained in nonparametric statistics. Specifically, for any point $x$ in the instance space $\X$, we define a notion of the {\it advantage at $x$}, denoted $\adv(x)$, which is rather like a local margin. We show that the prediction at $x$ is very likely to be correct once the number of training points exceeds $\tilde{O}(1/\adv(x))$. Universal consistency follows by establishing that almost all points have positive advantage.
 
 {\bf Yoav:} I would add to this figure something to indicate that
 points that are far from the boundary converge faster.
 
+\yoav{We have two variants. The one described here, which
+  only assumes a metric space, and the one in which we assume a
+  euclidean space. The first is more general, the second is needed for
+  active learning. I suggest we write the paper for case 1, and add a
+  section at the end regarding case 2.}  \shay{Note that in the second
+  one, where we assume a low VC dimension of the entire family of
+  balls also allow for a faster rate (I believe that the assumptions
+  we pick will yield a logarithmic rate in $1/\delta$). Therefore, if
+  we also wish to discuss rates of convergence in this paper then we
+  should consider including it.} 
+  
+\subsection{Related work}
+
+Need to fill this in.
+
 \section{Setup}
 
-Let $(\X, d)$ be a separable metric space and let $\Y =
-\{-1,1\}$. There is a fixed but unknown distribution $P$ over $\X \times \Y$.
+Take the instance space to be any separable metric space $(\X, d)$ and the label space to be $\Y = \{-1,+1\}$. All data are assumed to be drawn i.i.d.\ from a fixed but unknown distribution $P$ over $\X \times \Y$.
 
-Let $S$ be a measurable subset of $\X$.
-Define $\mu$ to be the probability of $S$ under $P$, that is,
-$$ \mu(S) = \pr(X \in S) $$
-Let $x \in \X$ be an input point $x \in \X$. Define 
-$$ \eta(x) = \E(Y| X = x)$$ as the conditional expectation, or the
-{\em bias}  of $Y$ given $x$.
-Similarly, for any measureable set $S$ let $\eta(S)$ denote the
-conditional expectation of $Y$ given $X \in S$:
+Let $\mu$ denote the marginal distribution on $\X$: if $(X,Y)$ is a 
+random draw from $P$, then
+$$ \mu(S) = \pr(X \in S)$$
+for any measurable set $S \subseteq \X$. For any point $x \in \X$, the conditional expectation, or {\em bias}, of $Y$ given $x$, is
+$$ \eta(x) = \E(Y| X = x) \in [-1,1] .$$ 
+Similarly, for any measurable set $S$ with $\mu(S) > 0$, the
+conditional expectation of $Y$ given $X \in S$ is
 $$ \eta(S) = \E(Y| X \in S) = \frac{1}{\mu(S)} \int_S \eta(x) \ d \mu(x) .$$
 
-The analysis of \algname\ for a point $x \in X$ is based on balls centered
-at $x$ $$ B(x,r) = \{ y \in \X \mbox{ s.t. } d(x,y) \leq r \} $$.
-
-To prevent division by zero we define the support of {\em bias} $\mu$ to be
-$$ \supp(\mu) = \{x \in \X: \mbox{$\mu(B(x,r)) > 0$ for all $r > 0$}\} .$$
-
-\algname\  converges quickly for points that are far
-from the decision boundary. In other words, for points $x$ that are
-the center of a ball $B(x,r)$ which has significant probability and
-significant bias, and that the sign of the bias agrees with the bias
-at $x$.
-
-\section{The adaptive $k$-NN algorithm}
-We assume the algorithm is given a labeled training set
-$(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)}) \in \X \times \Y$
-chosen IID according to the distribution $P$.
-
-Using the training set, the algorithm can compute empirical estimates of the
-probabilities and biases of different balls.
-
-Given $x \in \X$ we define $r_k(x)$ to be the distance between $x$ and
-it's $k$'th closest neighbor. We define $B_k(x)$ to be the ball,
-centered at $x$ that contains the $k$ nearest neighbors. We say that
-the empirical mass of $B_k(x)$ is $\mu_n(B_k(x)) = k/n$.
-
-We define the {\em empirical bias} of $B_k(x)$ as
+The risk of a classifier $g: \X \rightarrow \{-1,+1,?\}$ is the probability that it is incorrect on pairs $(X,Y) \sim P$,
 \begin{equation}
-  \eta_n(B_k(x))
-  = \frac{\sum_{i:x^{(i)} \in B_k(x)} y^{(i)}}{k}
+R(g) = P(\{(x,y): g(x) \neq y\}).
+\label{eq:risk}
+\end{equation}
+Thus, the Bayes-optimal classifier $g^*$, as given in (\ref{eq:bayes-opt}), depends only on $\eta$, but its risk $R^*$ depends on $\mu$. For a classifier $g_n$ based on $n$ training points from $P$, we will be interested in whether $R(g_n)$ converges to $R^*$, and the rate at which this convergence occurs.
+
+The algorithm and analysis in this paper depend heavily on the probability masses and biases of different balls in $\X$. For $x \in \X$ and $r \geq 0$, let $B(x,r)$ denote the closed ball of radius $r$ centered at $x$, 
+$$ B(x,r) = \{ z \in \X : d(x,z) \leq r \} .$$
+Let $r_p(x)$ be the smallest radius $r$ such that $B(x,r)$ has probability mass at least $p$, that is,
+\begin{equation}
+r_p(x) = \inf \{r \geq 0: \mu(B(x,r)) \geq p \}.
+\label{eq:probability-radius}
+\end{equation}
+It follows that $\mu(B(x,r_p(x))) \geq p$.
+
+The {\it support} of the marginal distribution $\mu$ plays an important role in convergence proofs and is formally defined as
+$$ \supp(\mu) = \{x \in \X: \mbox{$\mu(B(x,r)) > 0$ for all $r > 0$}\} .$$
+It is a well-known consequence of the separability of $\X$ that $\mu(\supp(\mu)) = 1$~\cite{CH67}.
+
+
+
+\section{The adaptive $k$-nearest neighbor algorithm}
+
+The algorithm is given a labeled training set
+$(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \Y$.
+Based on these points, it is able to compute empirical estimates of the probabilities and biases of different balls.
+
+For any set $S \subseteq \X$, we define its empirical count and probability mass as
+\begin{align}
+\notag \#_n(S) &= |\{i: x_i \in S\}| \\
+\mu_n(S) &= \frac{\#_n(S)}{n} .
+\label{eq:empirical-mass}
+\end{align}
+If this is non-zero, we take the empirical bias to be
+\begin{equation}
+\eta_n(S) = \frac{\sum_{i: x_i \in S} y_i}{\#_n(S)} .
 \label{eq:empirical-bias}
 \end{equation}
 
-The algorithm recieves as input a confidence parameter $0 < \delta <1$.
-
-Given a point $x$, the algorithm make a prediction $\{0,1,?\}$  according to the following rule:
-
+\begin{figure}
+\fbox{\begin{minipage}{5.25in}
+\vspace{.1in}
+\begin{center}
+\begin{minipage}{5in}
+Given: 
 \begin{itemize}
-\item Find the smallest $n \leq k>0$ for which the ball $B_k(x)$ has a
-  {\em significant margin}, i.e. such that $\left|\eta_n(B_k(x))\right| > \Delta(n,k,\delta)$
-  Where
-  $$ \Delta(n,k,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{k}}, $$
-where $k$ is the number of points $x^{(i)}$ in $B$. The constant $c_1$ is from Lemma~\ref{lemma:bias} below.
-\shay{I presume $d_0$ denotes the VC dimension of the family of all balls? 
-$d_0$ should be set to $1$ in the case of the ``expected-case'' analysis}
-\yoav{I suggest we push $d_0$ to the end of the paper}
-\item If there exists such a ball, return $\sign(\eta_n(B_k(x)))$.
-\item If no such ball exists: predict ?
+\item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \{-1,+1\}$
+\item confidence parameter $0 < \delta < 1$
 \end{itemize}
-Let $g_n: \X \rightarrow \{0,1,?\}$ denote this classifier.
-In the next sections we prove upper bounds on the rate at which  $g_n$ converges to $g$.
 
-\section{Point-wise Advantage}
-
-\newcommand{\advantage}{\mbox{adv}}
-\newcommand{\opt}{\mbox{adv}^*}
-\newcommand{\eopt}{\epsilon \mbox{-Opt}}
-
-In this section we define a  function $\opt(x)$ which
-characterizes the convergence rate of \algname\ at the point $x$.
-
-It follows from~\cite{ChaudhuriDasgupta2014} that, under the Lsbeque
-differentiation condition that for almost all $x$ there exists a radius
-$r>0$ such that $\sign(\bias(B(x,r))=s(x)$.
-
-\newcommand{\rconsist}{r_c}
-
-For this probability one set of points we 
-define the {\em consistency radius} $\rconsist(x)$ to be the 
-{\bf largest} radius  bias is consistent with the sign of $x$:
+\vspace{.1in}
+To predict at $x \in \X$:
+\begin{itemize}
+\item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
+\item Find the smallest $0 < k \leq n$ for which the $B_k(x)$ has a
+  {\em significant margin}, that is, $\left|\eta_n(B_k(x))\right| > \Delta(n, \#_n(B_k(x)),\delta)$, where
 \begin{equation}
-\rconsist(x) = \sup \left\{ r>0 \mbox{ s.t. } \forall r' \leq r, \;\sign(\eta(B(x,r')))
-  =  s(x) \right\}
+\Delta(n,m,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{m}}.
+\label{eq:delta-default}
 \end{equation}
+\item If there exists such a ball, return label $\sign(\eta_n(B_k(x)))$.
+\item If no such ball exists: return ``?''
+\end{itemize}
+\vspace{.1in}
+\end{minipage}
+\end{center}
+\end{minipage}}
+\caption{The adaptive $k$-NN (AKNN) classifier. The absolute constant $c_1$ is from Lemma~\ref{lemma:bias}.}
+\label{fig:alg}
+\end{figure}
 
+The adaptive $k$-NN algorithm (AKNN) is shown in Figure~\ref{fig:alg}. It makes a prediction at $x$ by growing a ball around $x$ until the ball has significant bias, and then choosing the corresponding label. In some cases, a ball of sufficient bias may never be obtained, in which event ``?'' is returned. In what follows, let $g_n: \X \rightarrow \{-1,+1,?\}$ denote the AKNN classifier.
 
-We quantify the convergence rate of the ball $B(x,r)$ using the
-{\em advantage} of the ball which we define as
+Later, we will also discuss a variant of this algorithm in which a modified confidence interval,
 \begin{equation}
-\advantage(B(x,r)) \doteq \mu(B(x,r)) \eta(B(x,r))^2
+\Delta(n,m,\delta) = c_1 \sqrt{\frac{d_o \log n + \log (1/\delta)}{m}},
+\label{eq:delta-modified}
 \end{equation}
+is used, where $d_o$ is the VC dimension of balls in $(\X,d)$. 
 
-We define the {\em optimal advantage} for $x$ to be $\opt(x)= \sup_{r \leq r_c(x)} \advantage(B(x,r))$.
-Next, we show that the rate of convergence of \algname\ at the point $x$ is characterized by $\opt(x)$
+\section{Pointwise advantage and rates of convergence}
 
-\section{Convergence bounds}
+We now provide finite-sample rates of convergence for the adaptive nearest neighbor rule. For simplicity, we give convergence rates that are specific to any query point $x$ and that depend on a suitable notion of the ``margin'' of distribution $P$ around $x$.
 
-The First theorem holds for any separable metric space.
-\begin{theorem} [Point-wise convergence rate]
-Fix a point $x \in \supp(\mu)$ and a confidence parameter $\delta>0$. If the size of the training set satisfies   
-$$ n > \frac{C}{\opt(x)} \log \frac{n}{\delta}$$
-then he probability that \algname\ predict the label of $x$ incorrectly is smaller than $\delta$. Where $C$ is a universal constant.
+Pick any $p, \gamma > 0$. Recalling definition (\ref{eq:probability-radius}), we say a point $x \in \X$ is $(p, \gamma)$-salient if either
+\begin{itemize}
+\item $\eta(x) > 0$, and $\eta(B(x,r)) \geq 0$ for all $r \in [0,r_p(x))$, and $\eta(B(x,r_p(x))) \geq \gamma$
+\end{itemize}
+or
+\begin{itemize}
+\item $\eta(x) < 0$, and $\eta(B(x,r)) \leq 0$ for all $r \in [0,r_p(x))$, and $\eta(B(x,r_p(x))) \leq -\gamma$.
+\end{itemize}
+A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The {\it advantage} of $x$ is taken to be the largest value of $p\gamma^2$ over all such pairs:
+\begin{equation}
+\adv(x) = 
+\left\{
+\begin{array}{ll}
+\sup \{ p \gamma^2: \mbox{$x$ is $(p,\gamma)$-salient}\} & \mbox{if $\eta(x) \neq 0$} \\
+0 & \mbox{if $\eta(x) = 0$}
+\end{array}
+\right.
+\label{eq:advantage}
+\end{equation}
+We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition on the underlying metric measure space, almost all $x$ with $\eta(x) \neq 0$ have positive advantage.
+
+\begin{theorem}[Pointwise convergence rate]
+There is an absolute constant $C > 0$ for which the following holds. Pick a point $x \in \supp(\mu)$ and a confidence parameter $0 < \delta < 1$. Suppose the AKNN algorithm (Figure~\ref{fig:alg}) is used to define a classifier $g_n$ based on training points chosen i.i.d.\ from $P$. If the size of the training set satisfies 
+$$ n \geq \frac{C}{\adv(x)} \max \left( \log \frac{1}{\adv(x)}, \ \log \frac{1}{\delta} \right),$$
+then with probability at least $1-\delta$, we will have $g_n(x) = g^*(x)$.
+\label{thm:pointwise-rate}
 \end{theorem}
 
-
-The second theorem has the additional requirement that the VC-dim of the balls is bounded by $d$.
-
-Define the set of points with optimal advantage at least $\alpha$ as
-$$ \X_\alpha = \left\{ x \in \supp(\mu) \mbox{ such that } \opt(x) \geq \alpha \right\} $$
-
-We can prove uniform convergence over $\X_\alpha$:
+We can also give a uniform convergence rate for a modified version of the algorithm that uses confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}).
 
 \begin{theorem} [Uniform convergence rate]
-Fix a confidence parameter $\delta>0$. If the size of the training set satisfies
-$$ n > \frac{C}{\alpha} d \log \frac{n}{\delta}$$
-then he probability that \algname\ predict the label of $x$ incorrectly for {\em any} $x \in \X_\alpha$ is smaller than $\delta$. Where $C$ is a universal constant.
+Suppose that the set of balls in $(\X,d)$ has finite VC dimension $d_o$, and that the algorithm of Figure~\ref{fig:alg} is used with confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}). Pick any $0 < \delta < 1$. With probability at least $1-\delta$, the resulting classifier $g_n$ will have $g_n(x) = g^*(x)$ for all $x \in \supp(\mu)$ for which 
+$$ n \geq \frac{C}{\adv(x)} \max \left( d_o \log \frac{d_o}{\adv(x)}, \ \log \frac{1}{\delta} \right).$$
+\label{thm:uniform-rate}
 \end{theorem}
 
 
+\section{Universal consistency}
+\label{sec:universal-consistency}
 
+In this section we study the convergence of $R(g_n)$ to the Bayes risk $R^*$ as the number of points $n$ grows. An estimator is described as universally consistent in a metric measure space $(\X, d, \mu)$ if it has this desired limiting behavior for all conditional expectation functions $\eta$.
 
-\section{Convergence of the probability of the balls}
-It follows, using the same argument as in \cite{ChaudhuriDasgupta2014}, that the adaptive nearest neighbor rule is universally consistent as long as the metric space $(\X, d, \mu)$ satisfies Lebesgue's differentiation condition: that is, for any bounded measurable $f: \X \rightarrow \R$ and for $\mu$-almost\footnote{I.e., the set of points which does not satisfy the condition has measure $0$ under $\mu$.} every $x$,
-$$ \lim_{r \downarrow 0} \frac{1}{\mu(B(x,r))} \int_{B(x,r)} f \ d\mu = f(x) .$$
-This holds in any finite-dimensional normed space, or any doubling metric space.
-\shay{In order for consistency to hold, 
-one should tune $\delta= \delta(n)$ such that $\delta(n)\to_{n\to\infty} 0$.
-(note that $\delta$ is a parameter of our algorithm, unlike in \cite{ChaudhuriDasgupta2014}, where $\delta$
-was just defined for sake of analysis). }
+Earlier work~\cite{ChaudhuriDasgupta2014} has established the universal consistency of $k$-nearest neighbor (for $k/n \rightarrow 0$ and $k/(\log n) \rightarrow \infty$) in any metric measure space that satisfies the Lebesgue differentiation condition: that is, for any bounded measurable $f: \X \rightarrow \R$ and for all $x \in \X$ (except a set of $\mu$-measure zero),
+\begin{equation}
+\lim_{r \downarrow 0} \frac{1}{\mu(B(x,r))} \int_{B(x,r)} f \ d\mu = f(x) .
+\label{eq:lebesgue-condition}
+\end{equation}
+This is known to hold, for instance, in any finite-dimensional normed space or any doubling metric space.
 
+We will now see that this same condition implies the universal consistency of the adaptive nearest neighbor rule. To begin with, it implies that almost every point has positive advantage.
+\begin{lemma}
+Suppose metric measure space $(\X, d, \mu)$ satisfies the differentiation condition (\ref{eq:lebesgue-condition}). Then the set of points
+$$ \{x \in \X: \eta(x) \neq 0, \, \adv(x) = 0\}$$
+has zero $\mu$-measure.
+\label{lemma:positive-advantage}
+\end{lemma}
+\begin{proof}
+Let $\X' \subseteq \X$ consist of all points $x \in \supp(\mu)$ that for which condition (\ref{eq:lebesgue-condition}) holds true with $f=\eta$, that is, $\lim_{r \downarrow 0} \eta(B(x,r)) = \eta(x)$. 
+Since $\mu(\supp(\mu))=1$, it follows that $\mu(\X') = 1$. 
 
+Pick any $x \in \X'$ with $\eta(x) \neq 0$; without loss of generality, it is $> 0$. There exists $r_o > 0$ such that
+$$\eta(B(x,r)) \geq \eta(x)/2 \mbox{\  for all \ } 0 \leq r \leq r_o.$$
+Thus $x$ is $(p,\gamma)$-salient for $p = \mu(B(x,r_o)) > 0$ and $\gamma = \eta(x)/2$, and hence has positive advantage.
+\end{proof}
 
-\section{Large deviation bounds}
+Universal consistency follows as a consequence; the proof details are deferred to Section~\ref{sec:proof-outline}.
+\begin{theorem}
+Suppose $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\lim_{n \rightarrow \infty} \delta_n = 0$, (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$, and (3) \lim_{N \rightarrow \infty} \sum_{n \geq N} \delta_n = 0$. Let classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the adaptive nearest neighbor procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
+\label{thm:universal-consistency}
+\end{theorem}
 
-Suppose that all data $(x,y)$ is obtained by independent draws from an underlying distribution $P$ on $\X \times \Y$. For $(X,Y) \sim P$, define $\mu$ to be the marginal distribution of $X$, that is,
-$$ \mu(S) = \pr(X \in S) $$
-for measurable sets $S$. Let $\eta$ be the conditional probability distribution of $Y$ given $x$,
-$$ \eta(x) = \pr(Y = 1| X = x) .$$
-For measurable $S$, let $\eta(S)$ denote the average $\eta$-value, that is,
-$$ \eta(S) = \pr(Y = 1| X \in S) = \frac{1}{\mu(S)} \int_S \eta \ d \mu .$$
+\section{Finite rates and proof outline}
+\label{sec:proof-outline}
 
-Suppose we draw $n$ points $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_{n,\delta}(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
+A key step towards proving Theorems~\ref{thm:pointwise-rate}, \ref{thm:uniform-rate}, and \ref{thm:universal-consistency} 
+is to identify the subset of $\X$ that is likely to be correctly classified for a given number of training points $n$. This follows the rough outline of \cite{ChaudhuriDasgupta2014}, which gave rates of convergence for $k$-nearest neighbor, but there are two notable differences. First, we will see that the likely-correct sets obtained in that earlier work (for $k$-NN) are subsets of those we obtain for the new adaptive nearest neighbor procedure. Second, the proof for our setting is considerably more streamlined; for instance, there is no need to devise tie-breaking strategies for deciding the identities of the $k$ nearest neighbors.
+
+\subsection{A comparison with $k$-nearest neighbor}
+
+For $a \geq 0$, let $\X_a$ denote all points with advantage at least $a$:
+\begin{equation}
+\X_a = \{x \in \supp(\mu): \adv(x) > a \} .
+\label{eq:advantage-set}
+\end{equation}
+In particular, $\X_0$ consists of all points with positive advantage. 
+
+By Theorem~\ref{thm:pointwise-rate}, points in $\X_a$ are likely to be correctly classified when the number of training points is $\widetilde{\Omega}(1/a)$, where the $\widetilde{\Omega}(\cdot)$ notation ignores logarithmic terms.
+In contrast, the work of \cite{ChaudhuriDasgupta2014} showed that with $n$ training points, the $k$-NN classifier is likely to correctly classify the following set of points:
+\begin{align*}
+\X'_{n,k} &= \{x \in \supp(\mu): \eta(x) > 0, \eta(B(x,r)) \geq k^{-1/2} \mbox{\ for all $0 \leq r \leq r_{k/n}(x)$}\} \\
+&\ \cup \{x \in \supp(\mu): \eta(x) < 0, \eta(B(x,r)) \leq -k^{-1/2} \mbox{\ for all $0 \leq r \leq r_{k/n}(x)$}\} .
+\end{align*}
+Such points are $(k/n, k^{-1/2})$-salient and thus have advantage at least $1/n$. In fact,
+$$ \bigcup_{1 \leq k \leq n} \X'_{n,k} \subseteq \X_{1/n} .$$
+In this sense, the adaptive nearest neighbor procedure is able to as well as all choices of $k$ simultaneously.
+
+The first step in establishing advantage-dependent rates of convergence is to bound the accuracy of empirical estimates of probability mass and bias. This is achieved by a careful choice of large deviation bounds.
+
+\subsection{Large deviation bounds}
+
+Suppose we draw $n$ points $(x_1, y_1), \ldots, (x_n, y_n)$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_n(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 7]
-There is a universal constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
-$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
+There is a universal constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_o$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
+$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_o \log \frac{n}{\delta} \right)
 \ \ \implies \ \ 
-\mu_{n,\delta}(B) \geq \frac{k}{n} .$$
+\mu_{n}(B) \geq \frac{k}{n} .$$
 \label{lemma:points-in-balls}
 \end{lemma}
 
-Likewise, we would expect the empirical bias of a set $S \subset \X$, as defined in (\ref{eq:empirical-bias}), to be close to its true bias,
-$$ \bias(S) = \frac{\pr(Y = 1, X \in S)}{\pr(X \in S)} - \frac{1}{2} .$$
-This is defined when $\mu(S) > 0$ and lies in the range $[-1/2,1/2]$.
-
+Likewise, we would expect the empirical bias $\eta_n(S)$ of a set $S \subset \X$, as defined in (\ref{eq:empirical-bias}), to be close to its true bias $\eta(S)$. The latter is defined whenever $\mu(S) > 0$.
 \begin{lemma}
-There is a universal constant $c_1$ for which the following holds. Let $\B$ be a class of subsets of $\X$ with VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$,
-  $$ \left| \bias_n(B) - \bias(B) \right| \ \leq \ \Delta(n, k(B)) $$
-where $k(B) = |\{i: x^{(i)} \in B\}|$ is the number of points inside $B$ and 
+There is a universal constant $c_1$ for which the following holds. Let $\B$ be a class of subsets of $\X$ with VC dimension $d_o$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$,
+  $$ \left| \eta_n(B) - \eta(B) \right| \ \leq \ \Delta(n, \#_n(B), \delta) $$
+where $\#_n(B) = |\{i: x_i \in B\}|$ is the number of points in $B$ and 
 \begin{equation}
-\Delta(n,k) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{k}} .
+\Delta(n,k,\delta) = c_1 \sqrt{\frac{d_o \log n + \log (1/\delta)}{k}} .
 \label{eq:delta-defn}
 \end{equation}
 \label{lemma:bias}
@@ -303,10 +406,89 @@ where $k(B) = |\{i: x^{(i)} \in B\}|$ is the number of points inside $B$ and
 \Cref{lemma:bias} is a special case of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
 that we present and prove in \Cref{sec:ucecm}.
 
-\section{Universal consistency}
-\label{sec:universal-consistency}
-In this section we show that $g_n$ converges the the Bayes rule as
-$n \to \infty$.
+\subsection{Proof of Theorem~\ref{thm:pointwise-rate}}
+
+\begin{lemma}
+There is a universal constant $c_3 > 0$ for which the following holds. Pick any $x \in \supp(\mu)$ with $\adv(x) > 0$. Fix any $0 < \delta < 1$. If the number of training points satisfies
+$$ n \geq \frac{c_3}{\adv(x)} \max\left(\ln \frac{c_3}{\adv(x)}, \ \ln \frac{1}{\delta} \right), $$
+then with probability at least $1-\delta^2$ over the choice of training data, the adaptive nearest neighbor rule will have $g_n(x) = g^*(x)$.
+\label{lemma:pointwise}
+\end{lemma}
+\begin{proof}
+Define $c_2 = \max(c_1, 1/2) \sqrt{1+c_o}$, where $c_o$ and $c_1$ are the constants from Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, and take $c_3 = 16 c_2^2$.
+
+Suppose $\eta(x) > 0$; the negative case is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension $d_o = 1$. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
+\begin{enumerate}
+\item For any integer $k$, we have $\#_n(B) \geq k$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
+\item $|\eta_n(B) - \eta(B)| \leq \Delta(n, \#_n(B), \delta)$.
+\end{enumerate}
+Assume henceforth that these hold.
+
+By definition of advantage, point $x$ is $(p,\gamma)$-salient for some $p,\gamma> 0$ with $\adv(x) = p\gamma^2$. The lower bound on $n$ implies that
+\begin{equation}
+\gamma \geq 2c_2 \sqrt{\frac{\log n + \log (1/\delta)}{np}} ,
+\label{eq:gamma}
+\end{equation}
+or equivalently that $n \cdot \adv(x) \geq 4c_2^2 (\log n + \log (1/\delta))$.
+
+Set $k = np/(1 + c_0)$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
+\begin{align*}
+\eta_n(B) \ \geq \ \eta(B) - \Delta(n, k, \delta)
+&= \gamma - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
+&\geq 2c_2 \sqrt{\frac{\log (n/\delta)}{np}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}}\\
+&\geq 2c_1 \sqrt{\frac{\log (n/\delta)}{k}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
+&= c_1 \sqrt{\frac{\log (n/\delta)}{k}} \geq \Delta(n, \#_n(B), \delta) .
+\end{align*}
+Thus ball $B$ would trigger a prediction of $+1$.
+
+At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
+$$ \eta_n(B') \geq \eta(B') - \Delta(n, \#_n(B'), \delta) > -\Delta(n, \#_n(B'), \delta) $$
+and thus no such ball will trigger a prediction of $-1$. Therefore, the prediction at $x$ must be $+1$.
+\end{proof}
+
+\subsection{Proof of Theorem~\ref{thm:uniform-rate}}
+
+This proof is along the same lines as that of Theorem~\ref{thm:pointwise-rate}. A crucial difference is that uniform large deviation bounds (Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}) are applied to the class of all balls in $\X$, which is assumed to have finite VC dimension $d_o$. In contrast, the proof of Theorem~\ref{thm:pointwise-rate} only applies these bounds to the class of balls centered at a specific point, which has VC dimension at most 1 in any metric space.
+
+\subsection{Proof of Theorem~\ref{thm:universal-consistency}}
+
+Recall from (\ref{eq:advantage-set}) that $\X_a$ denotes the set of points with advantage $\geq a$.
+\begin{lemma}
+Pick any $0 < \delta < 1$ as a confidence parameter for the AKNN estimator of Figure~\ref{fig:alg}. Fix any $a > 0$. If the number of training points $n$ satisfies
+$$ n \geq \frac{c_3}{a} \max\left(\ln \frac{c_3}{a}, \ \ln \frac{1}{\delta} \right), $$
+then with probability at least $1-\delta$, the resulting classifier $g_n$ has risk
+$$ R(g_n) - R^* \leq \delta + \mu(\X_0 \setminus \X_a) .$$
+\label{lemma:advantage-set-convergence}
+\end{lemma}
+\begin{proof}
+From Lemma~\ref{lemma:pointwise}, we have that for any $x \in \X_a$, 
+$$ \pr_n(g_n(x) \neq g^*(x)) \leq \delta^2 ,$$
+where $\pr_n$ denotes probability over the choice of training points. Thus, for $X \sim \mu$,
+$$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X_a) \leq \delta^2 ,$$
+and by Markov's inequality,
+$$ \pr_n [\pr_X (g_n(X) \neq g^*(X) |  X \in \X_a) \geq \delta] \leq \delta.$$
+Thus, with probability at least $1-\delta$ over the training set,
+$$\pr_X (g_n(X) \neq g^*(X) |  X \in \X_a) \leq \delta .$$
+On points with $\eta(x) = 0$, both $g_n$ and the Bayes-optimal $g^*$ incur the same risk. Thus
+\begin{align*}
+R(g_n) - R^*
+&\leq \pr_X(g_n(X) \neq g^*(X) | X \in \X_a) + \pr_X(X \not\in \X_a, \eta(X) \neq 0) \\ 
+&\leq \delta + \pr_X(X \in \X_0 \setminus \X_a) + \pr_X(\adv(X) = 0, \eta(X) \neq 0) \\ 
+&\leq \delta + \mu(\X_0 \setminus \X_a),
+\end{align*}
+where we invoke Lemma~\ref{lemma:positive-advantage} for the last step.
+\end{proof}
+
+We now complete the proof of Theorem~\ref{thm:universal-consistency}. Given the sequence of confidence parameters $(\delta_n)$, define a sequence of advantage values $(a_n)$ by
+$$ a_n = \frac{c_3}{n} \max \left( 2 \ln n, \ \ln \frac{1}{\delta_n} \right) .$$
+The conditions on $(\delta_n)$ imply $a_n \rightarrow 0$.
+
+Pick any $\epsilon > 0$. By the conditions on $(\delta_n)$, we can pick $N$ so that $\sum_{n \geq N} \delta_n \leq \epsilon$. Let $\omega$ denote a realization of an infinite training sequence $(X_1, Y_1), (X_2, Y_2), \ldots$ from $P$. By Lemma~\ref{lemma:advantage-set-convergence}, for any positive integer $N$,
+$$ \pr \left(\omega: \exists n \geq N \mbox{\ s.t.\ } R(g_n(\omega)) - R^* > \delta_n + \mu(\X_0 \setminus \X_{a_n}) \right) \leq \sum_{n \geq N} \delta_n \leq \epsilon.$$
+Thus, with probability at least $1-\epsilon$ over the training sequence $\omega$, we have that for all $n \geq N$,
+$$ R(g_n(\omega)) - R^* \leq \delta_n + \mu(\X_0 \setminus \X_{a_n}) ,$$
+whereupon $R(g_n(\omega)) \rightarrow R^*$ (since $\delta_n, a_n \rightarrow 0$). Since this holds for any $\epsilon  >0$, the theorem follows.
+
 \section{High-probability convergence}
 
 In this section, we make a further assumption that allows us to strengthen \Cref{thm:general-error-bound}, tightly quantifying over all query points simultaneously. 
@@ -352,10 +534,6 @@ So, in order to get explicit bounds in both settings, we need to figure out how 
 with hidden constant depending on the assumptions we make.
 \akshay{Here I think the smoothness condition introduced in \cite{ChaudhuriDasgupta2014} is relevant.}
 
-
-\section{Rates of convergence}
-
-
 \subsubsection{Shay's comments}
 
 There are two natural settings we could consider: (i) convergence in expectation, and (ii) convergence with high probability.
@@ -363,48 +541,6 @@ Convergence in expectation boils down to \Cref{thm:general-error-bound} in the p
 For convergence with high probability we further assume that the VC dimension of the family of all balls is bounded. 
 Note that in this case we should also change the definition of $\Delta(n,k)$  in the algorithm so that it has the right dependence on the VC dimension. \akshay{It's already correct in the initial definition of the algorithm, but not consistent in the definitions of $\X^{\pm}_n$.} What we can prove in this case is \Cref{thm:fastrate} (stated in a subsection below), 
 which can also be phrased more similarly to \Cref{thm:general-error-bound}) as in \Cref{thm:fastrate2}.
-
-
-
-\subsubsection{Akshay's notes}
-
-
-\subsubsection{Sanjoy's notes}
-We now provide finite-sample rates of convergence of the adaptive nearest neighbor rule. For simplicity, we give convergence rates that are specific to any query point $x$ and that depend on a suitable notion of the ``margin'' of distribution $P$ around $x$.
-
-Pick any $p, \gamma > 0$. We define a point $x \in \X$ as $(p, \gamma)$-salient if 
-\begin{itemize}
-\item either $\eta(x') \geq 1/2 + \gamma$ for all $x' \in B(x, r_p(x))$
-\item or $\eta(x') \leq 1/2 - \gamma$ for all $x' \in B(x, r_p(x))$.
-\end{itemize}
-If $\eta$ and $\mu$ are continuous then for any $x \in \X$ with $\eta(x) \neq 1/2$, there must be some sufficiently small $p, \gamma > 0$ for which this is true.
-
-Let $S_{p, \gamma}$ be the set of all $(p, \gamma)$-salient points. We then define the {\it margin} of any $x \in \X$ as
-$$ m(x) = \max_{S_{p, \gamma} \ni x} p \gamma^2 .$$
-Notice that if 
-$$ n \geq \frac{1}{m(x)} \log \frac{1}{m(x)} ,$$
-then $x \in \X_n^+ \cup \X_n^-$, as defined in Section~\ref{sec:universal-consistency}, and thus $x$ is very likely to be correctly classified by the adaptive nearest neighbor rule, given a training set of $n$ points.
-\shay{Should $\gamma,p$ depend on $\delta$ for this containment to hold? Note that the definitions of $\X_n^+,\X_n^-$ do depend on $\delta$.}
-\akshay{Agreed, as in \Cref{thm:fastrate2}.}
-
-\subsubsection{Earlier notes}
-
-In order that a point $x$ be classified correctly for a small value of $n$ it suffices that there is a ball $B$ centered at $x$ with significant bias and significant probability. More precisely, if there is a ball of probability $p$ around $x$ for which there is a uniform bias of $\gamma$ then probability that the adaptive NN rule is incorrect 
-on $x$ is $\exp(-c k \gamma^2) \approx \exp(-c p n \gamma^2)$
-
-We formalize this as follows.
-
-Let $\X_{\alpha}^+$ be the set of points $x \in \X$ such that there exist $p,\gamma>0$ such that $p \gamma^2 \geq \alpha$ and  $\forall x' \in B(x,p)$ $\eta(x')\geq \gamma$. $\X_{\alpha}^-$ is defined similarly.
-
-Then we have the following theorem:
-\begin{theorem}\label{thm:fastrate}
-For all $\alpha>0$ and all $x \in \X_{\alpha}^+ \cup \X_{\alpha}^-$ the probability that $\algname$ predicts incorrectly on $x$ is upper bounded by $\exp(-c n \alpha)$.
-\end{theorem}
-
-
-\section{Related Work}
-
-
 
 
 \section{Uniform Convergence of Empirical Conditional Measures}
@@ -946,47 +1082,6 @@ that this probability is at most $\delta/2$.
 
 \section{Proofs}
 
-\begin{proof}[Proof of \Cref{lemma:good-sets}]
-Fix any $x \in \X^+_{n,\delta}$; the case of $x \in \X^-_{n,\delta}$ is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension 1. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
-\begin{enumerate}
-\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
-\item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B))$.
-\end{enumerate}
-Assume henceforth that these hold.
-
-Let $p = p_x$ be as specified in the definition of $\X^+_{n,\delta}$. Set $k = np/(1 + c_0)$. We first observe that $k \geq \log (n/\delta)$. This is because the definition of $p$ implies $c_2 \sqrt{\log (n/\delta)/(np)} \leq 1/2$ and thus $np \geq 4 c_2^2 \log (n/\delta) \geq (1+c_0) \log (n/\delta)$.
-
-As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$. Thus, by property 1, the ball $B = B(x, r_p(x))$ has $\mu_n(B) \geq k/n$. This means, in turn, that by property 2,
-\begin{align*}
-\bias_n(B) &\geq \bias(B) - \Delta(n, k) \\
-&\geq c_2 \sqrt{\frac{\log (n/\delta)}{np}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
-&\geq 2c_1 \sqrt{\frac{\log (n/\delta)}{k}} - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
-&= c_1 \sqrt{\frac{\log (n/\delta)}{k}} \geq \Delta(n, n \mu_n(B)) .
-\end{align*}
-Thus ball $B$ would trigger a prediction of $1$.
-
-At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
-$$ \bias_n(B') \geq \bias(B') - \Delta(n, n \mu_n(B')) > -\Delta(n, n \mu_n(B')) $$
-and thus no such ball will trigger a prediction of $0$. Therefore, the prediction at $x$ must be $1$.
-\end{proof}
-
-
-\begin{proof}[Proof of \Cref{thm:general-error-bound}]
-From Lemma~\ref{lemma:good-sets}, we have that for any $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$, 
-$$ \pr_n(g_n(x) \neq g^*(x)) \leq \delta^2 ,$$
-where $\pr_n$ denotes probability over the choice of training points. Thus, for $X \sim \mu$,
-$$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X^+_{n,\delta} \cup \X^-_{n,\delta}) \leq \delta^2 ,$$
-and by Markov's inequality,
-$$ \pr_n [\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_{n,\delta} \cup \X^-_{n,\delta}) \geq \delta] \leq \delta.$$
-Thus, with probability at least $1-\delta$ over the training set,
-$$\pr_X (g_n(X) \neq g^*(X) |  X \in \X^+_{n,\delta} \cup \X^-_{n,\delta}) \leq \delta$$
-and
-$$ \pr_X(g_n(X) \neq g^*(X)) 
-\ \leq \ \delta \ \pr(X \in \X^+_{n,\delta} \cup X^-_{n,\delta}) + \pr(X \not\in \X^+_{n,\delta} \cup \X^-_{n,\delta})
-\ \leq \ \delta + \mu(\partial_n) .$$
-\end{proof}
-
-
 To prove \Cref{thm:fastrate2}, a relevant application of VC theory from \cite{ChaudhuriDasgupta2010} is useful:
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 16]
 \label{lemma:points-in-balls-2}
@@ -1019,8 +1114,6 @@ and thus no such ball will trigger a prediction of $-1$. Therefore, the algorith
 
 The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically. 
 \end{proof}
-
-
 
 
 \end{document}
