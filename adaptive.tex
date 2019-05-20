@@ -101,7 +101,9 @@ Shay Moran\\
 \maketitle
 
 \begin{abstract}
-We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that the parameter $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood.  We provide convergence rates on the accuracy of our classifier that depend on a local quantity we call the "advantage," which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. We provide theory and experiments that demonstrate that the algorithm performs almost as well as $k$-NN with an optimal choice of $k$.
+We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that the parameter $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger values of $k$ for predicting the labels of points in noisy regions.)  
+
+We provide theory and experiments that demonstrate that the algorithm performs almost as well as $k$-NN with an optimal choice of $k$. In particular, we derive bounds on the convergence rates of our classifier that depend on a local quantity we call the "advantage,” which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. These generalization bounds hinge on a variant of the seminal Uniform Convergence Theorem due to Vapnik and Chervonenkis; this variant concerns conditional probabilities and may be of independent interest. 
 \end{abstract}
 
 \section{Introduction}
@@ -364,7 +366,10 @@ then $g_n(x)=g^*(x)$.
 
 A key step towards proving Theorems~\ref{thm:pointwise-rate} and \ref{thm:uniform-rate} is to identify the subset of $\X$ that is likely to be correctly classified for a given number of training points $n$. This follows the rough outline of \cite{ChaudhuriDasgupta2014}, which gave rates of convergence for $k$-nearest neighbor, but there are two notable differences. First, we will see that the likely-correct sets obtained in that earlier work (for $k$-NN) are subsets of those we obtain for the new adaptive nearest neighbor procedure. Second, the proof for our setting is considerably more streamlined; for instance, there is no need to devise tie-breaking strategies for deciding the identities of the $k$ nearest neighbors.
 
+
+
 \subsection{A comparison with $k$-nearest neighbor}
+\label{sec:knn-comparison}
 
 For $a \geq 0$, let $\X_a$ denote all points with advantage greater than $a$:
 \begin{equation}
@@ -489,7 +494,7 @@ At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
 $$ \eta_n(B') \geq \eta(B') - \Delta(n, \#_n(B'), \delta) > -\Delta(n, \#_n(B'), \delta) $$
 and thus no such ball will trigger a prediction of $-1$. Therefore, the prediction at $x$ must be $+1$.
 \end{proof}
-
+x
 \subsection{Proof of Theorem~\ref{thm:uniform-rate}}
 
 This proof follows much the same outline as that of Theorem~\ref{thm:pointwise-rate}. A crucial difference is that uniform large deviation bounds (Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}) are applied to the class of all balls in $\X$, which is assumed to have finite VC dimension $d_0$\footnote{This is motivated by finite-dimensional Euclidean space $\mathbb{R}^{D}$, where it holds with $d_0 = D+1$ (\cite{dudley79}).}. In contrast, the proof of Theorem~\ref{thm:pointwise-rate} only applies these bounds to the class of balls centered at a specific point, which has VC dimension at most 1 in any metric space.
@@ -645,7 +650,7 @@ This resembles the learning rate in realizable settings.
 %$\Theta\left(\sqrt{\frac{d\log n}{p(B)n - \sqrt{dn}}}\right)$, 
 %which is for a large $n$ roughly $\sqrt{\frac{d\log n}{p(B)n}}$.
 
-A relevant remark is that a weaker statement than \Cref{thm:UCECM}
+We remark that a weaker statement than \Cref{thm:UCECM}
 can be derived as a corollary of the classical uniform convergence
 result~\citep{vapnik1971uniform}. 
 Indeed, since the VC dimension of $\{B\cap A : i\in \I\}$ is at most $d_0$, it follows that 
@@ -1188,28 +1193,13 @@ which finishes the proof.
 
 \section{Experiments}
 
-We test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. 
-
-Several of the datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
+We test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. Some datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
 
 
-\subsection{Datasets}
 
-The notMNIST dataset (\cite{notMNIST}) consists of extracted glyphs of the letters A-J from publicly available fonts. We test $\algname$ on this 10-way classification task.
-
-We use $\algname$ a challenging binary classification task of independent and continuing interest, involving single-cell gene expression data from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}). The data are collected using the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Each approach has its own ill-understood set of technical biases, and discriminating between the two is of great interest in revealing these.
-
-
-\subsection{Varying $A$}
+\subsection{Varying the confidence parameter $A$}
 
 The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no neighborhood with a sufficiently significant label bias. This is illustrated in Figure \ref{fig:varyingparam}.
-
-
-
-\subsection{Adaptively chosen neighborhood sizes reflect local confidence}
-
-The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict on 
-
 
 \begin{figure}
 \fbox{\begin{minipage}{5.25in}
@@ -1243,6 +1233,10 @@ To predict at $x \in \X$:
 
 
 
+\subsection{Adaptively chosen neighborhood sizes reflect local confidence}
+
+The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict on (Fig. \ref{fig:varyingadak}).
+
 \begin{figure}
     \centering
     \begin{subfigure}[t]{0.3\textwidth}
@@ -1260,9 +1254,11 @@ To predict at $x \in \X$:
         \centering
         \includegraphics[width=\linewidth]{figs/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
     \end{subfigure}
-  \caption{Labels and $\algname$ predictions on notMNIST}
+  \caption{Labels (left) and $\algname$ predictions (center \& right) on notMNIST}
   \label{fig:varyingparam}
 \end{figure}
+
+
 
 
 
@@ -1303,6 +1299,40 @@ To predict at $x \in \X$:
 \end{figure}
 
 
+\subsection{$\algname$ is comparable to the best $k$-NN rule}
+
+The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
+
+\begin{figure}
+    \begin{subfigure}[t]{0.5\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST_accvsabst.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST_aknnvsknn.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \hfill
+  \caption{$\algname$ performance on notMNIST.}
+  \label{fig:aknnvsknn}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \bibliography{ref}
 \bibliographystyle{alpha}
 
@@ -1338,11 +1368,8 @@ Then, with probability at least $1-\delta$ over the choice of training points,
 Here $g_n$ is the adaptive nearest neighbor classifier based on the $n$ training points and $g^*$ is the Bayes-optimal classifier. 
 \end{theorem}
 
-\akshay{Is it worth showing that \Cref{thm:fastrate2} is tight, like the instance-dependent lower bounds of \cite{ChaudhuriDasgupta2014}?}
+%\akshay{Is it worth showing that \Cref{thm:fastrate2} is tight, like the instance-dependent lower bounds of \cite{ChaudhuriDasgupta2014}?}
 
-
-
-The difference with \Cref{thm:general-error-bound} is that the $\delta$ term is removed.
 
 {\it To summarize, for convergence in expectation we bound the error by $\delta + \mu(\partial_n)$,
 and for convergence with high probability we bound it by $\mu(\partial_n)$.}
@@ -1399,6 +1426,14 @@ The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically.
 \end{proof}
 
 \section{Experimental Results}
+
+\subsection{Datasets}
+
+We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extracted glyphs of the letters A-J from publicly available fonts. We use the 18724 labeled examples from this set.
+
+We also test on the MNIST dataset. \akshay{Yoav, please add any preprocessing steps you used here.}
+
+We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving single-cell gene expression data from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}). The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Each approach has its own ill-understood set of technical biases, and discriminating between the two to identify these biases is currently of great interest.
 
 \begin{figure}
 \begin{center}
