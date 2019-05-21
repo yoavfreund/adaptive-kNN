@@ -94,40 +94,41 @@ Yoav Freund \\
 \texttt{yfreund@eng.ucsd.edu} \\
 \And
 Shay Moran\\
-\texttt{shaymoran1@gmail.com} \\
+\texttt{shaym@princeton.edu} \\
 }
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that the parameter $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger values of $k$ for predicting the labels of points in noisy regions.)  
+We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger values of $k$ for predicting the labels of points in noisy regions.)  
 
-We provide theory and experiments that demonstrate that the algorithm performs almost as well as $k$-NN with an optimal choice of $k$. In particular, we derive bounds on the convergence rates of our classifier that depend on a local quantity we call the "advantage,” which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. These generalization bounds hinge on a variant of the seminal Uniform Convergence Theorem due to Vapnik and Chervonenkis; this variant concerns conditional probabilities and may be of independent interest. 
+We provide theory and experiments that demonstrate that the algorithm performs almost as well as $k$-NN with an optimal choice of $k$. In particular, we derive bounds on the convergence rates of our classifier that depend on a local quantity we call the ``advantage'' which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. These generalization bounds hinge on a variant of the seminal Uniform Convergence Theorem due to Vapnik and Chervonenkis; this variant concerns conditional probabilities and may be of independent interest. 
 \end{abstract}
 
 \section{Introduction}
 
 We introduce an adaptive nearest neighbor classification rule. Given a
-training set with labels $\{-1,+1\}$, its prediction at a query point $x$ is based on the training points closest to $x$, rather like
+training set with labels $\{\pm 1\}$, its prediction at a query point $x$ is based on the training points closest to $x$, rather like
 the $k$-nearest neighbor rule. However, the value of $k$ that it uses
 can vary from query to query. Specifically, if there are $n$ training
 points, then for any query $x$, the smallest $k$ is sought for which
 the $k$ points closest to $x$ have labels whose average is either
 greater than $+\Delta(n,k)$, in which case the prediction is $+1$, or
 less than $- \Delta(n,k)$, in which case the prediction is $-1$; and
-if no such $k$ exists, then ``?'' (``don't know'') is output.  Here $\Delta(n,k) \sim \sqrt{(\log n)/k}$ corresponds to a confidence interval for the average label in the region around the query.
+if no such $k$ exists, then ``?'' (``don't know'') is outputted.  
+Here, $\Delta(n,k) \sim \sqrt{(\log n)/k}$ corresponds to a confidence interval for the average label in the region around the query.
 
 We study this rule in the standard statistical framework in which all data are
 i.i.d.\ draws from some unknown underlying distribution $P$ on $\X
 \times \Y$, where $\X$ is the data space and $\Y$ is the label
 space. We take $\X$ to be a separable metric space, with distance
 function $d: \X \times \X \rightarrow \R$, and we take $\Y =
-\{-1,+1\}$. We can decompose $P$ into the
+\{\pm 1\}$. We can decompose $P$ into the
 marginal distribution $\mu$ on $\X$ and the conditional expectation of
 the label at each point $x$: if $(X,Y)$ represents a random draw from
 $P$, define $\eta(x) = \E(Y| X = x)$. In this terminology, the
-Bayes-optimal classifier is the rule $g^*: \X \rightarrow \{-1,+1\}$
+Bayes-optimal classifier is the rule $g^*: \X \rightarrow \{\pm 1\}$
 given by
 \begin{equation}
 g^*(x) = 
@@ -175,7 +176,7 @@ can pick the right $k$ in each neighborhood separately.
 \end{figure}
 
 Our estimator allows us to give rates of convergence that are tighter and more 
-transparent than those customarily obtained in nonparametric statistics. Specifically, for any point $x$ in the instance space $\X$, we define a notion of the {\it advantage at $x$}, denoted $\adv(x)$, which is rather like a local margin. We show that the prediction at $x$ is very likely to be correct once the number of training points exceeds $\tilde{O}(1/\adv(x))$. Universal consistency follows by establishing that almost all points have positive advantage.
+transparent than those customarily obtained in nonparametric statistics. Specifically, for any point $x$ in the instance space $\X$, we define a notion of the {\it advantage at $x$}, denoted $\adv(x)$, which is rather like a local margin. We show that the prediction at $x$ is very likely to be correct once the number of training points exceeds~$\tilde{O}(1/\adv(x))$. Universal consistency follows by establishing that almost all points have positive advantage.
 
 {\bf Yoav:} I would add to this figure something to indicate that
 points that are far from the boundary converge faster.
@@ -192,10 +193,18 @@ The first two of these issues are partially addressed by recent work of \cite{Ch
 
 In the present paper, we obtain finite-sample rates of convergence that are ``instance-optimal'' not just for the specific distribution $P$ but also for the specific query point. This is achieved by defining a {\it margin}, or {\it advantage}, at every point in the input space, and giving bounds (Theorem~\ref{thm:pointwise-rate}) entirely in terms of this quantity. For parametric classification, it has become common to define a notion of margin that controls generalization. In the nonparametric setting, it makes sense that the margin would in fact be a function $\X \rightarrow \R$, and would yield different generalization error bounds in different regions of space. Our adaptive nearest neighbor classifier allows us to realize this vision in a fairly elementary manner.
 
-\shay{Add a roadmap of the paper.}
-\section{Setup}
+\paragraph{Organization.} 
+{\new{We begin by formally describing the setup and notation in \Cref{sec:setup}.
+Then, a formal description of the adaptive $k$-NN algorithm is given in~\Cref{sec:alg}.
+In \Cref{sec:gen1,sec:gen2,sec:gen3} we state and prove consistency and generalization
+bounds for this classifier, and compare them with previous bounds in the $k$-NN literature.
+These bounds exploit a general VC-based uniform convergence statement
+which is presented and proved in a self-contained manner in \Cref{sec:ucecm}.}}
 
-Take the instance space to be a separable metric space $(\X, d)$ and the label space to be $\Y = \{-1,+1\}$. All data are assumed to be drawn i.i.d.\ from a fixed unknown distribution $P$ over $\X \times \Y$.
+
+\section{Setup}\label{sec:setup}
+
+Take the instance space to be a separable metric space $(\X, d)$ and the label space to be $\Y = \{\pm 1\}$. All data are assumed to be drawn i.i.d.\ from a fixed unknown distribution $P$ over $\X \times \Y$.
 
 Let $\mu$ denote the marginal distribution on $\X$: if $(X,Y)$ is a 
 random draw from $P$, then
@@ -228,7 +237,7 @@ It is a well-known consequence of the separability of $\X$ that $\mu(\supp(\mu))
 
 
 
-\section{The adaptive $k$-nearest neighbor algorithm}
+\section{The adaptive $k$-nearest neighbor algorithm}\label{sec:alg}
 
 The algorithm is given a labeled training set
 $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \Y$.
@@ -253,7 +262,7 @@ If this is non-zero, we take the empirical bias to be
 \begin{minipage}{5in}
 Given: 
 \begin{itemize}
-\item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \{-1,+1\}$
+\item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \{\pm 1\}$
 \item confidence parameter $0 < \delta < 1$
 \end{itemize}
 
@@ -262,7 +271,7 @@ To predict at $x \in \X$:
 \begin{itemize}
 \item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
 \item Find the smallest $0 < k \leq n$ for which the $B_k(x)$ has a
-  {\em significant bias}, that is, $\left|\eta_n(B_k(x))\right| > \Delta(n, \#_n(B_k(x)),\delta)$, where
+  {\em significant bias}: that is,~$\left|\eta_n(B_k(x))\right| > \Delta(n, \#_n(B_k(x)),\delta)$, where
 \begin{equation}
 \Delta(n,m,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{m}}.
 \label{eq:delta-default}
@@ -287,7 +296,7 @@ Later, we will also discuss a variant of this algorithm in which a modified conf
 \end{equation}
 is used, where $d_0$ is the VC dimension of balls in $(\X,d)$. 
 
-\section{Pointwise advantage and rates of convergence}
+\section{Pointwise advantage and rates of convergence}\label{sec:gen1}
 
 We now provide finite-sample rates of convergence for the adaptive nearest neighbor rule. For simplicity, we give convergence rates that are specific to any query point $x$ and that depend on a suitable notion of the ``margin'' of distribution $P$ around $x$.
 
@@ -310,7 +319,7 @@ A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The
 \right.
 \label{eq:advantage}
 \end{equation}
-We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition on the underlying metric measure space, almost all $x$ with $\eta(x) \neq 0$ have positive advantage.
+We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition on the underlying metric measure space, almost all $x$ with $\eta(x) \neq 0$ have a positive advantage.
 
 \subsection{Advantage-based finite-sample bounds}
 
@@ -328,6 +337,10 @@ We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition o
 %I suggest to use ``pick'' for $\delta$, and use ``let'' for $x$.
 %Here is an alternative formulation (feel free to modify/discard).}
 
+{\new{The following theorem shows that for every point $x$,
+if the sample size $n$ satisfies $n\gtrapprox 1/\adv(x)$,
+then the label of $x$ is likely to be $g^*(x)$, where $g^*$ is the bayes optimal classifier.}}
+
 \begin{theorem}[Pointwise convergence rate]
 There is an absolute constant $C > 0$ for which the following holds.
 Let $0 < \delta < 1$ denote the confidence parameter in the AKNN algorithm (\Cref{fig:alg}),
@@ -340,7 +353,9 @@ then with probability at least $1-\delta$ we have that $g_n(x)=g^*(x)$.
 
 
 
-We can also give a uniform convergence rate for a modified version of the algorithm that uses confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}).
+{\new{If we further assume that the family of all balls in the space has a finite VC dimension $d_o$ then 
+we can strengthen \Cref{thm:pointwise-rate} so that the guarantee holds with high probability \underline{simultaneously} for all $x\in \supp(\mu)$.
+This is achieved by a modified version of the algorithm that uses confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}).}}
 
 %\begin{theorem} [Uniform convergence rate]
 %Suppose that the set of balls in $(\X,d)$ has finite VC dimension $d_0$, and that the algorithm of Figure~\ref{fig:alg} is used with confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}). Pick any $0 < \delta < 1$. With probability at least $1-\delta$, the resulting classifier $g_n$ will have $g_n(x) = g^*(x)$ for all $x \in \supp(\mu)$ for which 
@@ -378,7 +393,7 @@ For $a \geq 0$, let $\X_a$ denote all points with advantage greater than $a$:
 \end{equation}
 In particular, $\X_0$ consists of all points with positive advantage. 
 
-By Theorem~\ref{thm:pointwise-rate}, points in $\X_a$ are likely to be correctly classified when the number of training points is $\widetilde{\Omega}(1/a)$, where the $\widetilde{\Omega}(\cdot)$ notation ignores logarithmic terms.
+By Theorem~\ref{thm:pointwise-rate}, points in $\X_a$ are likely to be correctly classified when the number of training points is~$\widetilde{\Omega}(1/a)$, where the $\widetilde{\Omega}(\cdot)$ notation ignores logarithmic terms.
 In contrast, the work of \cite{ChaudhuriDasgupta2014} showed that with $n$ training points, the $k$-NN classifier is likely to correctly classify the following set of points:
 \begin{align*}
 \X'_{n,k} &= \{x \in \supp(\mu): \eta(x) > 0, \eta(B(x,r)) \geq k^{-1/2} \mbox{\ for all $0 \leq r \leq r_{k/n}(x)$}\} \\
@@ -386,9 +401,9 @@ In contrast, the work of \cite{ChaudhuriDasgupta2014} showed that with $n$ train
 \end{align*}
 Such points are $(k/n, k^{-1/2})$-salient and thus have advantage at least $1/n$. In fact,
 $$ \bigcup_{1 \leq k \leq n} \X'_{n,k} \subseteq \X_{1/n} .$$
-In this sense, the adaptive nearest neighbor procedure is able to perform as well as all choices of $k$ simultaneously.
+In this formal sense, the adaptive nearest neighbor procedure is able to perform as well as all choices of $k$ simultaneously.
 
-\section{Universal consistency}
+\section{Universal consistency}\label{sec:gen2}
 \label{sec:universal-consistency}
 
 In this section we study the convergence of $R(g_n)$ to the Bayes risk $R^*$ as the number of points $n$ grows. An estimator is described as universally consistent in a metric measure space $(\X, d, \mu)$ if it has this desired limiting behavior for all conditional expectation functions $\eta$.
@@ -402,7 +417,8 @@ This is known to hold, for instance, in any finite-dimensional normed space or a
 
 We will now see that this same condition implies the universal consistency of the adaptive nearest neighbor rule. To begin with, it implies that almost every point has positive advantage.
 \begin{lemma}
-Suppose metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Then the set of points
+Suppose metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Then,
+{\new{for any conditional expectation $\eta$}}, the set of points
 $$ \{x \in \X: \eta(x) \neq 0, \, \adv(x) = 0\}$$
 has zero $\mu$-measure.
 \label{lemma:positive-advantage}
@@ -417,12 +433,12 @@ Thus $x$ is $(p,\gamma)$-salient for $p = \mu(B(x,r_o)) > 0$ and $\gamma = \eta(
 \end{proof}
 
 Universal consistency follows as a consequence; the proof details are deferred to Section~\ref{sec:proof-outline}.
-\begin{theorem}
-Suppose metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\lim_{n \rightarrow \infty} \delta_n = 0$, (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$, and (3) $\lim_{N \rightarrow \infty} \sum_{n \geq N} \delta_n = 0$. Let classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the adaptive nearest neighbor procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
+\begin{theorem}[Universal consistency]
+Suppose the metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\lim_{n \rightarrow \infty} \delta_n = 0$, (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$, and (3) $\lim_{N \rightarrow \infty} \sum_{n \geq N} \delta_n = 0$. Let the classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the adaptive nearest neighbor procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
 \label{thm:universal-consistency}
 \end{theorem}
 
-\section{Analysis}
+\section{Analysis and proofs}\label{sec:gen3}
 \label{sec:proof-outline}
 
 The first step in establishing advantage-dependent rates of convergence is to bound the accuracy of empirical estimates of probability mass and bias. This is achieved by a careful choice of large deviation bounds.
@@ -431,7 +447,7 @@ The first step in establishing advantage-dependent rates of convergence is to bo
 
 Suppose we draw $n$ points $(x_1, y_1), \ldots, (x_n, y_n)$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_n(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 7]
-There is a universal constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
+There is a universal constant $c_0$ such that the following holds. Let~$\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
 $$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
 \ \ \implies \ \ 
 \mu_{n}(B) \geq \frac{k}{n} .$$
@@ -440,9 +456,9 @@ $$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_0 \log \frac{n}{\del
 
 Likewise, we would expect the empirical bias $\eta_n(S)$ of a set $S \subset \X$, as defined in (\ref{eq:empirical-bias}), to be close to its true bias $\eta(S)$. The latter is defined whenever $\mu(S) > 0$.
 \begin{lemma}
-There is a universal constant $c_1$ for which the following holds. Let $\B$ be a class of subsets of $\X$ with VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$,
-  $$ \left| \eta_n(B) - \eta(B) \right| \ \leq \ \Delta(n, \#_n(B), \delta) $$
-where $\#_n(B) = |\{i: x_i \in B\}|$ is the number of points in $B$ and 
+There is a universal constant $c_1$ for which the following holds. Let $\mathcal{C}$ be a class of subsets of $\X$ with VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $C \in \mathcal{C}$,
+  $$ \left| \eta_n(C) - \eta(C) \right| \ \leq \ \Delta(n, \#_n(C), \delta) $$
+where $\#_n(C) = |\{i: x_i \in B\}|$ is the number of points in $C$ and 
 \begin{equation}
 \Delta(n,k,\delta) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{k}} .
 \label{eq:delta-defn}
@@ -450,10 +466,11 @@ where $\#_n(B) = |\{i: x_i \in B\}|$ is the number of points in $B$ and
 \label{lemma:bias}
 \end{lemma}
 
-\Cref{lemma:bias} is a special case of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
+\Cref{lemma:bias} is a special case\footnote{\new{Indeed, \Cref{lemma:bias} follows from \Cref{thm:UCECM} 
+by plugging $\cA = \{\X\times\{+1\}, \X\times\{-1\}\}$ and $\B = \{C\times\{\pm 1\} : C\in\mathcal{C}\}$.}} of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
 that we present and prove in \Cref{sec:ucecm}.
 
-\shay{TODO: explain somewhere how to derive Lemma 6 from Theorem 10 and give a pointer here to this explanation.}
+%\shay{TODO: explain somewhere how to derive Lemma 6 from Theorem 10 and give a pointer here to this explanation.}
 
 \subsection{Proof of Theorem~\ref{thm:pointwise-rate}}
 
@@ -494,10 +511,9 @@ At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
 $$ \eta_n(B') \geq \eta(B') - \Delta(n, \#_n(B'), \delta) > -\Delta(n, \#_n(B'), \delta) $$
 and thus no such ball will trigger a prediction of $-1$. Therefore, the prediction at $x$ must be $+1$.
 \end{proof}
-x
 \subsection{Proof of Theorem~\ref{thm:uniform-rate}}
 
-This proof follows much the same outline as that of Theorem~\ref{thm:pointwise-rate}. A crucial difference is that uniform large deviation bounds (Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}) are applied to the class of all balls in $\X$, which is assumed to have finite VC dimension $d_0$\footnote{This is motivated by finite-dimensional Euclidean space $\mathbb{R}^{D}$, where it holds with $d_0 = D+1$ (\cite{dudley79}).}. In contrast, the proof of Theorem~\ref{thm:pointwise-rate} only applies these bounds to the class of balls centered at a specific point, which has VC dimension at most 1 in any metric space.
+This proof follows much the same outline as that of Theorem~\ref{thm:pointwise-rate}. A crucial difference is that uniform large deviation bounds (Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}) are applied to the class of all balls in $\X$, which is assumed\footnote{This is motivated by finite-dimensional Euclidean space $\mathbb{R}^{D}$, where it holds with $d_0 = D+1$ (\cite{dudley79}).} to have finite VC dimension $d_0$. In contrast, the proof of Theorem~\ref{thm:pointwise-rate} only applies these bounds to the class of balls centered at a specific point, which has VC dimension at most 1 in any metric space.
 
 %\sanjoy{How much more do we need to say here? There is more detail in the appendix.}
 
@@ -669,7 +685,7 @@ then we get better guarantees on the approximation of $P(A\vert B)$ by $P_n(A\ve
 As noted above,
 the standard uniform convergence bound for VC classes
 can not yield the bound in \Cref{thm:UCECM}.
-Instead, we use a variant of it due to~\cite{B05} which concerns {\it relative deviations}
+Instead, we use a variant of it due to~\cite{BBL05} which concerns {\it relative deviations}
 (see~\cite{BBL05}: Theorem 5.1 and the discussion before Corollary 5.2).
 In order to state the theorem, we need the following notation:
 Let $\cC$ be a family of subsets of $\X$. We denote by $\mathbb{S}_\cC:\mathbb{N}\to\mathbb{N}$ the {\it growth function} of $\cC$, which is defined by:
@@ -724,9 +740,9 @@ By \Cref{eq:BBL} we get:
 \begin{align*}
 P(A \vert B) &= \frac{P(A\cap B)}{P(B)}\\
 			 &\leq \frac{P_n(A\cap B) + 4\sqrt{P_n(A\cap B)\frac{D}{n}} + 8\frac{D}{n}}{P_n(B) - 4\sqrt{P_n(B)\frac{D}{n}} - 8\frac{D}{n}}\\
-			 &=\frac{\frac{P_n(A\cap B)}{P_n(B)} + 4\sqrt{\frac{P_n(A\cap B)}{P_n(B)}\frac{D}{nP_n(B)}} + 8\frac{D}{nP_n(B)}}{1 - 4\sqrt{\frac{D}{nP_n(B)}} - 8\frac{D}{nP_n(B)}}\\
+			 &=\frac{\frac{P_n(A\cap B)}{P_n(B)} + 4\sqrt{\frac{P_n(A\cap B)}{P_n(B)}\frac{D}{nP_n(B)}} + 8\frac{D}{nP_n(B)}}{1 - 4\sqrt{\frac{D}{nP_n(B)}} - 8\frac{D}{nP_n(B)}}s
 %			 &=\frac{P_n(A \vert B) + 4\sqrt{P_n(A \vert B)\frac{d_0\log 8n + \log(4/\delta)}{k}} + 8\frac{d_0\log 8n + \log(4/\delta)}{k}}{1 - 4\sqrt{\frac{d_0\log 8n + \log(4/\delta)}{k}} - 8\frac{d_0\log 8n + \log(4/\delta)}{k}}\\
-			 &=P_n(A \vert B)\frac{1+ 4\sqrt{\frac{D}{j}} + 8\frac{D}{j}}{1 - 4\sqrt{\frac{D}{k}} - 8\frac{D}{k}},
+			 =P_n(A \vert B)\frac{1+ 4\sqrt{\frac{D}{j}} + 8\frac{D}{j}}{1 - 4\sqrt{\frac{D}{k}} - 8\frac{D}{k}},
 \end{align*}
 where the first inequality follows from \Cref{eq:BBL} and the following equalities are trivial.
 Thus,
@@ -1197,9 +1213,13 @@ We test the adaptive nearest-neighbor rule on several datasets. As we are given 
 
 
 
-\subsection{Varying the confidence parameter $A$}
+\subsection{Varying the confidence parameter $A$ controls abstaining}
 
-The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no neighborhood with a sufficiently significant label bias. This is illustrated in Figure \ref{fig:varyingparam}.
+The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figure \ref{fig:varyingparam}.
+
+
+
+
 
 \begin{figure}
 \fbox{\begin{minipage}{5.25in}
@@ -1235,22 +1255,27 @@ To predict at $x \in \X$:
 
 \subsection{Adaptively chosen neighborhood sizes reflect local confidence}
 
-The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict on (Fig. \ref{fig:varyingadak}).
+The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict at all (Fig. \ref{fig:varyingadak}).
 
 \begin{figure}
     \centering
-    \begin{subfigure}[t]{0.3\textwidth}
+    \begin{subfigure}[t]{0.15\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST_labels.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
     \centering
         \includegraphics[width=\linewidth]{figs/notMNIST_labels.png} 
         %\caption{Price regulation} \label{fig:timing3}
     \end{subfigure}
     %\hfill
-    \begin{subfigure}[t]{0.3\textwidth}
+    \begin{subfigure}[t]{0.15\textwidth}
         \centering
         \includegraphics[width=\linewidth]{figs/notMNIST_preds_Aeq9.png} 
         %\caption{Competitors} \label{fig:timing2}
     \end{subfigure}
-    \begin{subfigure}[t]{0.34\textwidth}
+    \begin{subfigure}[t]{0.17\textwidth}
         \centering
         \includegraphics[width=\linewidth]{figs/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
     \end{subfigure}
@@ -1315,7 +1340,7 @@ The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compar
         %\caption{Competitors} \label{fig:timing2}
     \end{subfigure}
     \hfill
-  \caption{$\algname$ performance on notMNIST.}
+  \caption{$\algname$ performance on notMNIST. \yoav{Akshay, Please expand the caption}}
   \label{fig:aknnvsknn}
 \end{figure}
 
@@ -1429,9 +1454,9 @@ The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically.
 
 \subsection{Datasets}
 
-We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extracted glyphs of the letters A-J from publicly available fonts. We use the 18724 labeled examples from this set.
+We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extracted glyphs of the letters A-J from publicly available fonts. We use the 18724 labeled examples from this set, preprocessed feature-wise to be in $[-\frac{1}{2}, \frac{1}{2}]$ using $x \mapsto \frac{x}{255} - \frac{1}{2}$.
 
-We also test on the MNIST dataset. \akshay{Yoav, please add any preprocessing steps you used here.}
+We also test on the MNIST dataset. \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
 
 We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving single-cell gene expression data from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}). The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Each approach has its own ill-understood set of technical biases, and discriminating between the two to identify these biases is currently of great interest.
 
