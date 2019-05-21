@@ -378,6 +378,16 @@ then $g_n(x)=g^*(x)$.
 \label{thm:uniform-rate}
 \end{theorem}
 
+\shay{An observation which may be relevant: 
+I think if we can derive a rather clean statement by assuming that $\eta$ is {\it uniformly continuous}.
+Recall that uniform continuity means that the quantitative relation between $\eps$ and $\delta$
+in the definition of continuity is uniform over all $x\in \X$ 
+(i.e.\ $(\forall \epsilon)(\exists\delta)(\forall x,y):d(x,y)<\delta \implies \lvert\eta(x)-\eta(y) \rvert<\epsilon$.)
+Assuming this should give us uniform convergence outside the boundary:
+namely, that for any $\alpha>0$ there exists $n(\alpha)$ 
+such that if the algorithm is given $n(\alpha)$ samples then w.h.p it will predict like the Bayes optimal rule
+for every $x$ such that $\lvert\eta(x)\rvert \geq \alpha$, simultaneously. }
+
 
 A key step towards proving Theorems~\ref{thm:pointwise-rate} and \ref{thm:uniform-rate} is to identify the subset of $\X$ that is likely to be correctly classified for a given number of training points $n$. This follows the rough outline of \cite{ChaudhuriDasgupta2014}, which gave rates of convergence for $k$-nearest neighbor, but there are two notable differences. First, we will see that the likely-correct sets obtained in that earlier work (for $k$-NN) are subsets of those we obtain for the new adaptive nearest neighbor procedure. Second, the proof for our setting is considerably more streamlined; for instance, there is no need to devise tie-breaking strategies for deciding the identities of the $k$ nearest neighbors.
 
@@ -610,12 +620,17 @@ The first step in establishing advantage-dependent rates of convergence is to bo
 
 Suppose we draw $n$ points $(x_1, y_1), \ldots, (x_n, y_n)$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_n(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 7]
-There is a universal constant $c_0$ such that the following holds. Let~$\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
-$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
+There is a universal constant $c_o$ such that the following holds. Let~$\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
+$$ \mu(B) \geq \frac{k}{n} + \frac{c_o}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
 \ \ \implies \ \ 
 \mu_{n}(B) \geq \frac{k}{n} .$$
 \label{lemma:points-in-balls}
 \end{lemma}
+
+\shay{Why do we use $1-\delta^2/2$ and not $1-\delta$? 
+both choices are equivalent (by changing the constant $c_o$)
+and $1-\delta$ reads better\ldots }
+
 
 Likewise, we would expect the empirical bias $\eta_n(S)$ of a set $S \subset \X$, as defined in (\ref{eq:empirical-bias}), to be close to its true bias $\eta(S)$. The latter is defined whenever $\mu(S) > 0$.
 \begin{lemma}
@@ -630,37 +645,47 @@ where $\#_n(C) = |\{i: x_i \in B\}|$ is the number of points in $C$ and
 \end{lemma}
 
 \Cref{lemma:bias} is a special case\footnote{\new{Indeed, \Cref{lemma:bias} follows from \Cref{thm:UCECM} 
-by plugging $\cA = \{\X\times\{+1\}, \X\times\{-1\}\}$ and $\B = \{C\times\{\pm 1\} : C\in\mathcal{C}\}$.}} of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
+by plugging in it $\cA = \{\X\times\{+1\}\}, \B = \{C\times\{\pm 1\} : C\in\mathcal{C}\}$.}} of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
 that we present and prove in \Cref{sec:ucecm}.
 
 %\shay{TODO: explain somewhere how to derive Lemma 6 from Theorem 10 and give a pointer here to this explanation.}
 
 \subsection{Proof of Theorem~\ref{thm:pointwise-rate}}
 
-\begin{lemma}
-There is a universal constant $c_3 > 0$ for which the following holds. Pick any $x \in \supp(\mu)$ with $\adv(x) > 0$. Fix any $0 < \delta < 1$. If the number of training points satisfies
-$$ n \geq \frac{c_3}{\adv(x)} \max\left(\log \frac{c_3}{\adv(x)}, \ \log \frac{1}{\delta} \right), $$
-then with probability at least $1-\delta^2$ over the choice of training data, the adaptive nearest neighbor rule will have $g_n(x) = g^*(x)$.
-\label{lemma:pointwise}
-\end{lemma}
+\begin{theorem*}[\Cref{thm:pointwise-rate} restatement] 
+There is an absolute constant $C > 0$ for which the following holds.
+Let $0 < \delta < 1$ denote the confidence parameter in the AKNN algorithm (\Cref{fig:alg}),
+and suppose the algorithm is used to define a classifier $g_n$ based on $n$ training points chosen i.i.d.\ from $P$. 
+Then, for every point $x\in\supp(\mu)$, if
+\[n \geq \frac{C}{\adv(x)} \max \left( \log \frac{1}{\adv(x)}, \ \log \frac{1}{\delta} \right)\]
+then with probability at least $1-\delta$ we have that $g_n(x)=g^*(x)$.
+\end{theorem*}
+
+
+%\begin{lemma}
+%There is a universal constant $c_3 > 0$ for which the following holds. Pick any $x \in \supp(\mu)$ with $\adv(x) > 0$. Fix any $0 < \delta < 1$. If the number of training points satisfies
+%$$ n \geq \frac{c_3}{\adv(x)} \max\left(\log \frac{c_3}{\adv(x)}, \ \log \frac{1}{\delta} \right), $$
+%then with probability at least $1-\delta^2$ over the choice of training data, the adaptive nearest neighbor rule will have $g_n(x) = g^*(x)$.
+%\label{lemma:pointwise}
+%\end{lemma}
 \begin{proof}
 Define $c_2 = \max(c_1, 1/2) \sqrt{1+c_o}$, where $c_o$ and $c_1$ are the constants from Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, and take $c_3 = 16 c_2^2$.
 
 Suppose $\eta(x) > 0$; the negative case is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension $d_0 = 1$. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
 \begin{enumerate}
-\item For any integer $k$, we have $\#_n(B) \geq k$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
+\item For any integer $k$, we have $\#_n(B) \geq k$ whenever $n \mu(B) \geq k + c_o \max(k, \log (n/\delta))$.
 \item $|\eta_n(B) - \eta(B)| \leq \Delta(n, \#_n(B), \delta)$.
 \end{enumerate}
 Assume henceforth that these hold.
 
-By definition of advantage, point $x$ is $(p,\gamma)$-salient for some $p,\gamma> 0$ with $\adv(x) = p\gamma^2$. The lower bound on $n$ implies that
+By the definition of advantage, point $x$ is $(p,\gamma)$-salient for some $p,\gamma> 0$ with $\adv(x) = p\gamma^2$. The lower bound on $n$ in the theorem statement implies that
 \begin{equation}
 \gamma \geq 2c_2 \sqrt{\frac{\log n + \log (1/\delta)}{np}} ,
 \label{eq:gamma}
 \end{equation}
 or equivalently that $n \cdot \adv(x) \geq 4c_2^2 (\log n + \log (1/\delta))$.
 
-Set $k = np/(1 + c_0)$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
+Set $k = np/(1 + o)$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + o \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
 \begin{align*}
 \eta_n(B) &\geq \ \eta(B) - \Delta(n, k, \delta)
 = \gamma - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
@@ -741,23 +766,23 @@ and we let $d_0$ denote an upper bound on both $\mathsf{VC}(\cA)$ and $\mathsf{V
 To demonstrate the kinds of statements we would like to derive,
 consider the case where each of~$\cA,\cB$ contains only one event:
 $\cA=\{A\}$, and $\cB=\{B\}$,
-and set $k(B)=\sum_i 1_{[x_i\in B]}$.
-A Chernoff bound implies that conditioned on the event that $k(B)>0$, 
+and set $\#_n(B)=\sum_i 1_{[x_i\in B]}$.
+A Chernoff bound implies that conditioned on the event that $\#_n(B)>0$, 
 the following holds with probability at least~$1-\delta$:
 \begin{equation}\label{eq:chernoff}
-\left\lvert P(A\vert B) - P_n(A \vert B) \right\rvert \leq \sqrt{\frac{2\log(1/\delta)}{k(B)}}.
+\left\lvert P(A\vert B) - P_n(A \vert B) \right\rvert \leq \sqrt{\frac{2\log(1/\delta)}{\#_n(B)}}.
 \end{equation}
 To derive it, use that conditioned on $x_i\in B$, the event $x_i\in A$ has probability $P(A\vert B)$, 
-and therefore the random variable ``$k(B)\cdot p_n(A \vert B)$'' has a binomial distribution with parameters $k(B)$ and $P(A\vert B)$.
+and therefore the random variable ``$\#_n(B)\cdot p_n(A \vert B)$'' has a binomial distribution with parameters $\#_n(B)$ and $P(A\vert B)$.
 
-Note that the bound on the error in \Cref{eq:chernoff} depends on $k(B)$ and therefore is data-dependent.
+Note that the bound on the error in \Cref{eq:chernoff} depends on $\#_n(B)$ and therefore is data-dependent.
 We stress that this is the type of statement we want:
 the more samples belong to $B$, the more certain we are with the empirical estimate.
 Thus, we would want to prove a statement as follows:
 
 With probability at least~$1-\delta$,
-\[\left(\forall A\in\cA\right)\left(\forall B\in\B\right):\left\lvert P(A \vert B) - P_n(A \vert B) \right\rvert \leq O\left(\sqrt{\frac{d_0 \log(1/\delta)}{k(B)}}\right),\]
-where $k(B) = \sum_{i=1}^n 1[x_i\in B]$.
+\[\left(\forall A\in\cA\right)\left(\forall B\in\B\right):\left\lvert P(A \vert B) - P_n(A \vert B) \right\rvert \leq O\left(\sqrt{\frac{d_0 \log(1/\delta)}{\#_n(B)}}\right),\]
+where $\#_n(B) = \sum_{i=1}^n 1[x_i\in B]$.
 
 The above statement is, unfortunately, false. 
 As an example, consider the probability space defined by drawing $x \sim[n]$ uniformly,
@@ -787,9 +812,9 @@ be two families of measurable subsets of $X$ such that $\mathsf{VC}(\cA),\mathsf
 Let $n\in\mathbb{N}$, and let $x_1\ldots x_n$ be $n$ i.i.d samples from $P$.
 The, the following event occurs with probability at least $1-\delta$:
 \[\left(\forall A\in\cA\right)\left(\forall B\in\B\right):\left\lvert P(A \vert B) - P_n(A \vert B) \right\rvert \leq 
-\sqrt{\frac{k_o}{k(B)}},\]
+\sqrt{\frac{k_o}{\#_n(B)}},\]
 where $k_o = 1000 \left(d_0 \log(8n) + \log(4/\delta)\right)$, and\footnote{Note that the above inequality makes sense also when $k(B)=0$,
-by identifying $\frac{\cdot}{0}$ as $\infty$, and using the convention that $\infty-\infty=\infty$ and that $\infty\leq \infty$.} $k(B) = \sum_{i=1}^n 1[x_i\in B]$.
+by identifying $\frac{\cdot}{0}$ as $\infty$, and using the convention that $\infty-\infty=\infty$ and that $\infty\leq \infty$.} $\#_n(B) = \sum_{i=1}^n 1[x_i\in B]$.
 \end{theorem}
 
 \paragraph{Discussion.}
@@ -838,7 +863,7 @@ However, this bound guarantees non-trivial estimates only once $P(B)$ is roughly
 This is similar to the learning rate in agnostic (i.e., non-realizable) settings.
 
 Another major advantage of the uniform convergence bound in \Cref{thm:UCECM} is that it is data-dependent: 
-if many points from the sample belong to $B\in \cB$ (i.e.\ $k(B)$ is large), 
+if many points from the sample belong to $B\in \cB$ (i.e.\ $\#_n(B)$ is large), 
 then we get better guarantees on the approximation of $P(A\vert B)$ by $P_n(A\vert B)$ for all $A\in\cA$.
 
 
@@ -886,14 +911,14 @@ Therefore, applying \Cref{thm:ucrel} on $\cC$ yields that with probability $1-\d
 For the remainder of the proof we assume that the event in \Cref{eq:BBL} holds and argue that it implies
 the conclusion in \Cref{thm:UCECM}.
 Let $A\in\cA, B\in\cB$,  
-and let $k=n\cdot P_n(B)$ denote the number of data points in $B$. 
+and let $k=n\cdot P_n(B)=\#_n(B)$ denote the number of data points in $B$. 
 We want to show that
 \begin{equation}\label{eq:qed}
 \left\lvert P(A \vert B) - P_n(A \vert B) \right\rvert \leq 
 \sqrt{\frac{k_o}{k}},
 \end{equation}
 where $k_o=1000 \left(d_0 \log(8n) + \log(4/\delta)\right)$.
-Let $j=k\cdot P_n(A\vert B)$ denote the number of data points in~$A\cap B$.
+Let $j=k\cdot P_n(A\vert B) = \#_n(A\cap B)$ denote the number of data points in~$A\cap B$.
 We establish \Cref{eq:qed} by showing that 
 \[P(A \vert B) \leq  P_n(A\vert B)  + \sqrt{\frac{k_o}{k}}
 ~~~\text{ and }~~~ P(A \vert B) \geq  P_n(A\vert B)  - \sqrt{\frac{k_o}{k}}.
@@ -942,8 +967,6 @@ P(A \vert B) \geq  P_n(A\vert B)  - \sqrt{\frac{k_o}{k}},
 \]
 which finishes the proof.
 \qed
-
-
 
 
 
@@ -1386,7 +1409,7 @@ x \in \supp(\mu) : s \eta(x) > 0 , \exists p_x > 0 \text{ s.t. }
 &s \eta(B(x,r)) \geq 0 \quad\forall r \in (0, r_{p_x}(x)]
 \Bigg\}
 \end{align*}
-where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_0}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
+where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_o}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
 Also define 
 $$ \partial_n (\delta) = \X \setminus (\X^+_{n,\delta} (\delta) \cup \X^-_{n,\delta}) $$
 Then our main convergence rate result in this scenario shows that the measure of the effective boundary bounds the convergence of $\algname$.
@@ -1426,8 +1449,8 @@ with hidden constant depending on the assumptions we make.
 To prove \Cref{thm:fastrate2}, a relevant application of VC theory from \cite{ChaudhuriDasgupta2010} is useful:
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 16]
 \label{lemma:points-in-balls-2}
-There is an absolute constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
-$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)
+There is an absolute constant $c_o$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
+$$ \mu(B) \geq \frac{k}{n} + \frac{c_o}{n} \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)
 \ \ \implies \ \ 
 \mu_n(B) \geq \frac{k}{n} $$
 \end{lemma}
@@ -1436,12 +1459,12 @@ $$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \left( \kappa_{n, \delta} + \sqrt{k \
 Recall that we take the set $\B$ of all closed balls in $\X$ to have VC dimension at most $d_0$. 
 By \Cref{lemma:points-in-balls-2} and \Cref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
 \begin{enumerate}
-\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
+\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_o \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
 \item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B)) = c_1 \sqrt{\frac{\kappa_{n, \delta}}{n \mu_n(B)}}$
 \end{enumerate}
 Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$ w.p. 1 under $\mu$. 
 
-This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta}$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta}$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
+This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta}$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta}$, and set $k(x) = np(x) / (1 + c_o)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_o) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_o} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
 \begin{align*}
 \bias_n(B) &\geq \bias(B) - \Delta(n, k(x) ) 
 \geq c_2 \sqrt{\frac{\kappa_{n, \delta}}{np}} - c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} 
