@@ -438,6 +438,169 @@ Suppose the metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:leb
 \label{thm:universal-consistency}
 \end{theorem}
 
+
+\section{Experiments}
+
+We test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. Some datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
+
+
+
+\subsection{Varying the confidence parameter $A$ controls abstaining}
+
+The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figures \ref{fig:abst-vs-acc} and \ref{fig:varyingparam}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figs/notMNIST/notMNIST_accvsabst.png}
+  \caption{Abstain rate vs. accuracy on non-abstained points, plotted for $\algname$ on notMNIST. Each point represents the $\algname$ classifier learned with a different parameter $A$. The classifier is fairly indifferent to variation in $A$ at lower values, but at higher values increasing $A$ raises both the abstain rate and the accuracy on non-abstained points.}
+  \label{fig:abst-vs-acc}
+\end{figure}
+
+
+
+
+
+\begin{figure}
+\fbox{\begin{minipage}{5.25in}
+\vspace{.1in}
+\begin{center}
+\begin{minipage}{5in}
+Given: 
+\begin{itemize}
+\item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \mathcal{Y}$
+\item confidence parameter $A > 0$
+\end{itemize}
+\vspace{.1in}
+To predict at $x \in \X$:
+\begin{itemize}
+\item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
+\item Find the smallest $0 < k \leq n$ for which there exists a label $y \in \mathcal{Y}$ with respect to which $B_k(x)$ has a {\em significant bias}, that is,
+\begin{equation}
+\eta_n^{y} (B_k(x)) - \frac{1}{|\mathcal{Y}|} > \frac{A}{\sqrt{\#_n(B_k(x))}}.
+\label{eq:delta-condition-impl}
+\end{equation}
+\item If there exists such a ball, return the $y$ with maximum bias.
+\item If no such ball exists: return ``?''
+\end{itemize}
+\vspace{.1in}
+\end{minipage}
+\end{center}
+\end{minipage}}
+\caption{The adaptive $k$-NN (AKNN) classifier (multiclass, as implemented).}
+\label{fig:alg_practical}
+\end{figure}
+
+
+
+\subsection{Adaptively chosen neighborhood sizes reflect local confidence}
+
+The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict at all (Fig. \ref{fig:varyingadak}).
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[t]{0.30\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_labels.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    %\hfill
+    \begin{subfigure}[t]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq9.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.34\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+  \caption{Labels (left) and $\algname$ predictions (center \& right) on notMNIST}
+  \label{fig:varyingparam}
+\end{figure}
+
+
+
+
+
+\begin{figure}
+    \begin{subfigure}[t]{0.32\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq0.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq1.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq4.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+    
+    \begin{subfigure}[t]{0.32\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq6.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq8.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+  \caption{$\algname$ neighborhood sizes on notMNIST, in increasing order of $A$, plotted on a log scale. Top left figure ($A = 0$) represents a $1$-NN classifier. Bottom right figure ($A = 15$) shows that many of the points' neighborhoods are maximally large, which can be compared to the right panel of Fig. \ref{fig:varyingparam}.}
+  \label{fig:varyingadak}
+\end{figure}
+
+
+\subsection{$\algname$ is comparable to the best $k$-NN rule}
+
+The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
+
+
+
+\begin{figure}
+    \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnvsknn.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnfrac.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+  \centering
+  \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
+  \label{fig:aknnvsknn}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\bibliography{ref}
+\bibliographystyle{alpha}
+
+
+
+\appendix
+
 \section{Analysis and proofs}\label{sec:gen3}
 \label{sec:proof-outline}
 
@@ -1207,167 +1370,6 @@ which finishes the proof.
 %
 
 
-\section{Experiments}
-
-We test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. Some datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
-
-
-
-\subsection{Varying the confidence parameter $A$ controls abstaining}
-
-The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figures \ref{fig:abst-vs-acc} and \ref{fig:varyingparam}.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\linewidth]{figs/notMNIST/notMNIST_accvsabst.png}
-  \caption{Abstain rate vs. accuracy on non-abstained points, plotted for $\algname$ on notMNIST. Each point represents the $\algname$ classifier learned with a different parameter $A$. The classifier is fairly indifferent to variation in $A$ at lower values, but at higher values increasing $A$ raises both the abstain rate and the accuracy on non-abstained points.}
-  \label{fig:abst-vs-acc}
-\end{figure}
-
-
-
-
-
-\begin{figure}
-\fbox{\begin{minipage}{5.25in}
-\vspace{.1in}
-\begin{center}
-\begin{minipage}{5in}
-Given: 
-\begin{itemize}
-\item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \mathcal{Y}$
-\item confidence parameter $A > 0$
-\end{itemize}
-\vspace{.1in}
-To predict at $x \in \X$:
-\begin{itemize}
-\item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
-\item Find the smallest $0 < k \leq n$ for which there exists a label $y \in \mathcal{Y}$ with respect to which $B_k(x)$ has a {\em significant bias}, that is,
-\begin{equation}
-\eta_n^{y} (B_k(x)) - \frac{1}{|\mathcal{Y}|} > \frac{A}{\sqrt{\#_n(B_k(x))}}.
-\label{eq:delta-condition-impl}
-\end{equation}
-\item If there exists such a ball, return the $y$ with maximum bias.
-\item If no such ball exists: return ``?''
-\end{itemize}
-\vspace{.1in}
-\end{minipage}
-\end{center}
-\end{minipage}}
-\caption{The adaptive $k$-NN (AKNN) classifier (multiclass, as implemented).}
-\label{fig:alg_practical}
-\end{figure}
-
-
-
-\subsection{Adaptively chosen neighborhood sizes reflect local confidence}
-
-The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict at all (Fig. \ref{fig:varyingadak}).
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[t]{0.30\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_labels.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    %\hfill
-    \begin{subfigure}[t]{0.30\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq9.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.34\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-  \caption{Labels (left) and $\algname$ predictions (center \& right) on notMNIST}
-  \label{fig:varyingparam}
-\end{figure}
-
-
-
-
-
-\begin{figure}
-    \begin{subfigure}[t]{0.32\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq0.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq1.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq4.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-    \hfill
-    
-    \begin{subfigure}[t]{0.32\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq6.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq8.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-    \hfill
-  \caption{$\algname$ neighborhood sizes on notMNIST, in increasing order of $A$, plotted on a log scale. Top left figure ($A = 0$) represents a $1$-NN classifier. Bottom right figure ($A = 15$) shows that many of the points' neighborhoods are maximally large, which can be compared to the right panel of Fig. \ref{fig:varyingparam}.}
-  \label{fig:varyingadak}
-\end{figure}
-
-
-\subsection{$\algname$ is comparable to the best $k$-NN rule}
-
-The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
-
-
-
-\begin{figure}
-    \begin{subfigure}[t]{0.49\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnvsknn.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnfrac.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-  \centering
-  \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
-  \label{fig:aknnvsknn}
-\end{figure}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\bibliography{ref}
-\bibliographystyle{alpha}
-
-
-
-\appendix
 
 \section{High-probability convergence}
 
