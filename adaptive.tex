@@ -167,7 +167,7 @@ can pick the right $k$ in each neighborhood separately.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=3in]{adaptive-rationale.pdf}
+\includegraphics[width=3in]{figs/adaptive-rationale.pdf}
 \end{center}
 \caption{For values of $x$ on the left half of the shown interval, the
   pointwise bias $\eta(x)$ is close to $-1$ or $1$, and thus a small value of $k$ will yield an accurate prediction. Larger $k$ will not do as well, because they may run into neighboring regions with different labels. For values of $x$ on the right half of the interval, $\eta(x)$ is close to $0$, and thus large $k$ is essential for accurate prediction.}
@@ -1437,12 +1437,17 @@ We use $\algname$ on a challenging binary classification task of independent and
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=4in]{computing_NN-with_uniform_Noise_2.png}
+\includegraphics[width=6in]{figs/combined_figure.png}
 \end{center}
 \caption{Results from an experiment comparing the performance of k-NN on the MNIST data set for different noise levels $p$ and for different values of $k$. Note that the choice of $k$ has a large effect on the error, and that the larger the amount of noise $p$, the larger the value of $k$ needs to be.}
 \label{fig:mnist}
+\end{figure}
 
-A table comparing the performance of kNN, with the optimal choice of $k$ to that of Adaptive-kNN.
+
+\end{document}
+
+\iffalse
+%A table comparing the performance of kNN, with the optimal choice of $k$ to that of Adaptive-kNN.
 
 \begin{center}
  \begin{tabular}{||c | c | c | c||} 
@@ -1463,7 +1468,4 @@ A table comparing the performance of kNN, with the optimal choice of $k$ to that
  \hline
 \end{tabular}
 \end{center}
-
-\end{figure}
-
-\end{document}
+\fi
