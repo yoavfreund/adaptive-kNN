@@ -37,6 +37,8 @@
 \usepackage{algorithmicx}
 \usepackage{subcaption}
 
+\usepackage{adjustbox}
+
 \def\R{{\mathbb{R}}}
 \def\pr{{\rm Pr}}
 \def\E{{\mathbb E}}
@@ -540,37 +542,30 @@ The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compar
 
 
 \begin{figure}
-    \begin{subfigure}[t]{0.49\textwidth}
+    \begin{minipage}{0.49\textwidth}
     \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnvsknn.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnfrac.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-  \centering
-\caption{Performance of $\algname$ on notMNIST.
-  These figures relate several performance measures to $k$ - the
-  number of neighbors used to make the prediction. The black curve on
-  the LHS represents the accuracy of $k$-NN as a function of $k$. The
-  dashed horizontal line represents the best accuracy that is achieved
-  by $k$-NN (for $k \approx 10$). The three colored curves on the LHS
-  represent the accuracy of $\algname$ for three different values of the
-  confidence parameter $A$. The accuracy at a given $k$ is the
-  accuracy for the set of examples where $\algname$ chose the number of
-  neighbors to be smaller or equal to $k$. For the same three $\algname$ classifiers, the graphs on the RHS represent the coverage (the CDF of the predicted $k$-values). When $A$ is 3 or 9,
-  smaller values of $k$ yield no coverage. Observe that the curves on
-  the LHS start at the values of $k$ that the coverage increases from
-  zero. Of particular interest is the red curve, which corresponds to
-  $\algname$ with $A=1$. 
-  This curve shows that without restricting $k$, the learned classifier achieves full coverage and higher accuracy than the best achieved by $k$-NN.
-  %This curve reaches full coverage when $k$ is unrestricted and, when unrestricted, achieves 
-  }
-
-  % \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
-  
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_combinedGraphs.png}
+        \caption{\small Performance of $\algname$ on notMNIST for three different
+          settings of the confidence parameter $A=1,3,9$, as a
+          function of the neighborhood size.}
+      \end{minipage}
+      \hspace{0.2cm}
+      \begin{minipage}{0.49\textwidth}
+        \begin{small}
+          For each confidence level we show two graphs: an accuracy
+          graph (solid lines) and a coverage line (dashed line). for
+          each value of $k$ we plot the accuracy and the coverage of
+          AKNN which is restricted to using a neighborhood size of at
+          most $k$. For the most part, increasing $A$ causes an
+          increase in the accuracy and a decrease in coverage. Note
+          also that larger values of $A$ cause AKNN to have coverage
+          zero for values of $k$ that are too small. For comparison we
+          plot the performance of $k$-NN as a function of $k$. The
+          highest precision is 88.4\% which is achieved for
+          $k=10$. Interestingly, for this dataset both $A=1$ and $A=3$
+          achieve 100\% coverage and a precision of 89.3\%          
+          \end{small}
+      \end{minipage}  
   \label{fig:aknnvsknn}
 \end{figure}
 
