@@ -5,14 +5,14 @@
 % before loading neurips_2019
 
 % ready for submission
-% \usepackage{neurips_2019}
+\usepackage{neurips_2019}
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
 % [preprint] option:
 %     \usepackage[preprint]{neurips_2019}
 
 % to compile a camera-ready version, add the [final] option, e.g.:
-     \usepackage[final]{neurips_2019}
+% \usepackage[final]{neurips_2019}
 
 % to avoid loading the natbib package, add option nonatbib:
 %     \usepackage[nonatbib]{neurips_2019}
@@ -101,9 +101,9 @@ Shay Moran\\
 \maketitle
 
 \begin{abstract}
-We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger values of $k$ for predicting the labels of points in noisy regions.)  
+We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger $k$ for predicting the labels of points in noisy regions.)  
 
-We provide theory and experiments that demonstrate that the algorithm performs almost as well as $k$-NN with an optimal choice of $k$. In particular, we derive bounds on the convergence rates of our classifier that depend on a local quantity we call the ``advantage'' which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. These generalization bounds hinge on a variant of the seminal Uniform Convergence Theorem due to Vapnik and Chervonenkis; this variant concerns conditional probabilities and may be of independent interest. 
+We provide theory and experiments that demonstrate that the algorithm performs comparably to $k$-NN with an optimal choice of $k$\akshay{, and sometimes better}. In particular, we derive bounds on the convergence rates of our classifier that depend on a local quantity we call the ``advantage'' which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. These generalization bounds hinge on a variant of the seminal Uniform Convergence Theorem due to Vapnik and Chervonenkis; this variant concerns conditional probabilities and may be of independent interest. 
 \end{abstract}
 
 \section{Introduction}
@@ -178,14 +178,14 @@ can pick the right $k$ in each neighborhood separately.
 Our estimator allows us to give rates of convergence that are tighter and more 
 transparent than those customarily obtained in nonparametric statistics. Specifically, for any point $x$ in the instance space $\X$, we define a notion of the {\it advantage at $x$}, denoted $\adv(x)$, which is rather like a local margin. We show that the prediction at $x$ is very likely to be correct once the number of training points exceeds~$\tilde{O}(1/\adv(x))$. Universal consistency follows by establishing that almost all points have positive advantage.
 
-{\bf Yoav:} I would add to this figure something to indicate that
-points that are far from the boundary converge faster.
+\textcolor{red}{{\bf Yoav:} I would add to this figure something to indicate that
+points that are far from the boundary converge faster.}
   
 \subsection{Relation to other work in nonparametric estimation}
 
 For linear separators and many other {\it parametric} families of classifiers, it is possible to give rates of convergence that hold without any assumptions on the input distribution $\mu$ or the conditional expectation function $\eta$. This is not true of nonparametric estimation: although any target function can in principle be captured, the number of samples needed to achieve a specific level of accuracy will inevitably depend upon aspects of this function such as how fast it changes~\cite[chapter 7]{DGL96}. As a result, nonparametric statistical theory has focused on (1) asymptotic consistency, ideally without assumptions, and (2) rates of convergence under a variety of smoothness assumptions.
 
-Asymptotic consistency has been studied in great detail for the $k$-nearest neighbor classifier, when $k$ is allowed to grow with the number of data points $n$. The risk of the classifier, denoted $R_n$, is its error rate on the underlying distribution $P$; this is a random variable that depends upon the set of training points seen. Cover and Hart~\cite{CH67} showed that in general metric spaces, under the assumption that every $x$ in the support of $\mu$ is either a continuity point of $\eta$ or has $\mu(\{x\}) > 0$, the expected risk $\E R_n$ converges to the Bayes-optimal risk $R^*$, as long as $k \rightarrow \infty$ and $k/n \rightarrow 0$. For points in finite-dimensional Euclidean space, a series of results starting with Stone~\cite{S77} established consistency without any assumptions on $\mu$ or $\eta$, and showed that $R_n \rightarrow R^*$ almost surely~\cite{DGKL94}. More recent work has extended these {\it universal consistency} results---that is, consistency without assumptions on $\eta$---to arbitrary metric measure spaces $(\X, d, \mu)$ that satisfy a certain differentiation condition~\cite{CG06,ChaudhuriDasgupta2014}.
+Asymptotic consistency has been studied in great detail for the $k$-NN classifier, when $k$ is allowed to grow with the number of data points $n$. The risk of the classifier, denoted $R_n$, is its error rate on the underlying distribution $P$; this is a random variable that depends upon the set of training points seen. Cover and Hart~\cite{CH67} showed that in general metric spaces, under the assumption that every $x$ in the support of $\mu$ is either a continuity point of $\eta$ or has $\mu(\{x\}) > 0$, the expected risk $\E R_n$ converges to the Bayes-optimal risk $R^*$, as long as $k \rightarrow \infty$ and $k/n \rightarrow 0$. For points in finite-dimensional Euclidean space, a series of results starting with Stone~\cite{S77} established consistency without any assumptions on $\mu$ or $\eta$, and showed that $R_n \rightarrow R^*$ almost surely~\cite{DGKL94}. More recent work has extended these {\it universal consistency} results---that is, consistency without assumptions on $\eta$---to arbitrary metric measure spaces $(\X, d, \mu)$ that satisfy a certain differentiation condition~\cite{CG06,ChaudhuriDasgupta2014}.
 
 Rates of convergence have been obtained for $k$-nearest neighbor classification under various smoothness conditions including Holder conditions on $\eta$~\cite{KP95,G81} and ``Tsybakov margin'' conditions~\cite{MT99,AT07,ChaudhuriDasgupta2014}. Such assumptions have become customary in nonparametric statistics, but they leave a lot to be desired. First, they are uncheckable: it is not possible to empirically determine the smoothness given samples. Second, they view the underlying distribution $P$ through the tiny window of two or three parameters, obscuring almost all the remaining structure of the distribution that also influences the rate of convergence. Finally, because nonparametric estimation is {\it local}, there is the intriguing possibility of getting different rates of convergence in different regions of the input space: a possibility that is immediately defeated by reducing the entire space to two smoothness constants.
 
@@ -194,7 +194,7 @@ The first two of these issues are partially addressed by recent work of \cite{Ch
 In the present paper, we obtain finite-sample rates of convergence that are ``instance-optimal'' not just for the specific distribution $P$ but also for the specific query point. This is achieved by defining a {\it margin}, or {\it advantage}, at every point in the input space, and giving bounds (Theorem~\ref{thm:pointwise-rate}) entirely in terms of this quantity. For parametric classification, it has become common to define a notion of margin that controls generalization. In the nonparametric setting, it makes sense that the margin would in fact be a function $\X \rightarrow \R$, and would yield different generalization error bounds in different regions of space. Our adaptive nearest neighbor classifier allows us to realize this vision in a fairly elementary manner.
 
 \paragraph{Organization.} 
-{\new{We begin by formally describing the setup and notation in \Cref{sec:setup}.
+{\new{We begin by formally defining the setup and notation in \Cref{sec:setup}.
 Then, a formal description of the adaptive $k$-NN algorithm is given in~\Cref{sec:alg}.
 In \Cref{sec:gen1,sec:gen2,sec:gen3} we state and prove consistency and generalization
 bounds for this classifier, and compare them with previous bounds in the $k$-NN literature.
@@ -287,18 +287,18 @@ To predict at $x \in \X$:
 \end{minipage}
 \end{center}
 \end{minipage}}
-\caption{The adaptive $k$-NN (AKNN) classifier. The absolute constant $c_1$ is from Lemma~\ref{lemma:bias}.}
+\caption{The adaptive $k$-NN ($\algname$) classifier. The absolute constant $c_1$ is from Lemma~\ref{lemma:bias}.}
 \label{fig:alg}
 \end{figure}
 
-The adaptive $k$-NN algorithm (AKNN) is shown in Figure~\ref{fig:alg}. It makes a prediction at $x$ by growing a ball around $x$ until the ball has significant bias, and then choosing the corresponding label. In some cases, a ball of sufficient bias may never be obtained, in which event ``?'' is returned. In what follows, let $g_n: \X \rightarrow \{-1,+1,?\}$ denote the AKNN classifier.
+The adaptive $k$-NN algorithm ($\algname$) is shown in Figure~\ref{fig:alg}. It makes a prediction at $x$ by growing a ball around $x$ until the ball has significant bias, and then choosing the corresponding label. In some cases, a ball of sufficient bias may never be obtained, in which event ``?'' is returned. In what follows, let $g_n: \X \rightarrow \{-1,+1,?\}$ denote the $\algname$ classifier.
 
 Later, we will also discuss a variant of this algorithm in which a modified confidence interval,
 \begin{equation}
 \Delta(n,k,\delta) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{k}},
 \label{eq:delta-modified}
 \end{equation}
-is used, where $d_0$ is the VC dimension of balls in $(\X,d)$. 
+is used, where $d_0$ is the VC dimension of the family of balls in $(\X,d)$. 
 
 \section{Pointwise advantage and rates of convergence}\label{sec:gen1}
 
@@ -310,8 +310,11 @@ Pick any $p, \gamma > 0$. Recalling definition
 if the following holds for either $s=+1$ or $s=-1$:
 \begin{itemize}
 \item $s \eta(x) > 0$, and $s \eta(B(x,r)) > 0$ for all $r \in
-  [0,r_p(x))$, and $s \eta(B(x,r_p(x))) \geq s \gamma$
+  [0,r_p(x))$, and $s \eta(B(x,r_p(x))) \geq s \gamma$.
 \end{itemize}
+{\new{In words, this means that $g^*(x)=s$ (recall that $g^*$ is the Bayes classifier),
+that the biases of all balls of radius $\leq r$ around $x$ have the same sign like $s$, and that
+bias of the ball of radius $r$ has margin at least $\gamma$.}}
 A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The {\it advantage} of $x$ is taken to be the largest value of $p\gamma^2$ over all such pairs:
 \begin{equation}
 \adv(x) = 
@@ -328,7 +331,7 @@ We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition o
 \subsection{Advantage-based finite-sample bounds}
 
 %\begin{theorem}[Pointwise convergence rate]
-%There is an absolute constant $C > 0$ for which the following holds. Pick a point $x \in \supp(\mu)$ and a confidence parameter $0 < \delta < 1$. Suppose the AKNN algorithm (Figure~\ref{fig:alg}) is used to define a classifier $g_n$ based on $n$ training points chosen i.i.d.\ from $P$. If the size of the training set satisfies 
+%There is an absolute constant $C > 0$ for which the following holds. Pick a point $x \in \supp(\mu)$ and a confidence parameter $0 < \delta < 1$. Suppose the $\algname$ algorithm (Figure~\ref{fig:alg}) is used to define a classifier $g_n$ based on $n$ training points chosen i.i.d.\ from $P$. If the size of the training set satisfies 
 %$$ n \geq \frac{C}{\adv(x)} \max \left( \log \frac{1}{\adv(x)}, \ \log \frac{1}{\delta} \right),$$
 %then with probability at least $1-\delta$, we will have $g_n(x) = g^*(x)$.
 %\label{thm:pointwise-rate}
@@ -343,11 +346,14 @@ We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition o
 
 {\new{The following theorem shows that for every point $x$,
 if the sample size $n$ satisfies $n\gtrapprox 1/\adv(x)$,
-then the label of $x$ is likely to be $g^*(x)$, where $g^*$ is the bayes optimal classifier.}}
+then the label of $x$ is likely to be $g^*(x)$, where $g^*$ is the Bayes optimal classifier.
+This provides a pointwise convergence of $g(x)$ to $g^*(x)$ with a rate which
+is sensitive to the ``local geometry'' of~$x$.
+}}
 
 \begin{theorem}[Pointwise convergence rate]
 There is an absolute constant $C > 0$ for which the following holds.
-Let $0 < \delta < 1$ denote the confidence parameter in the AKNN algorithm (\Cref{fig:alg}),
+Let $0 < \delta < 1$ denote the confidence parameter in the $\algname$ algorithm (\Cref{fig:alg}),
 and suppose the algorithm is used to define a classifier $g_n$ based on $n$ training points chosen i.i.d.\ from $P$. 
 Then, for every point $x\in\supp(\mu)$, if
 \[n \geq \frac{C}{\adv(x)} \max \left( \log \frac{1}{\adv(x)}, \ \log \frac{1}{\delta} \right)\]
@@ -373,7 +379,7 @@ This is achieved by a modified version of the algorithm that uses confidence int
 
 \begin{theorem} [Uniform convergence rate]
 %There is an absolute constant $C > 0$ for which the following holds.
-%Let $0 < \delta < 1$ denote the confidence parameter in the AKNN algorithm (\Cref{fig:alg}).
+%Let $0 < \delta < 1$ denote the confidence parameter in the $\algname$ algorithm (\Cref{fig:alg}).
 Suppose that the set of balls in $(\X,d)$ has finite VC dimension $d_0$, and that the algorithm of Figure~\ref{fig:alg} is used with confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}). 
 Then, with probability at least $1-\delta$, the resulting classifier $g_n$ satisfies the following: 
 for every point~$x\in\supp(\mu)$, if
@@ -383,17 +389,19 @@ then $g_n(x)=g^*(x)$.
 \end{theorem}
 
 \shay{An observation which may be relevant: 
-I think if we can derive a rather clean statement by assuming that $\eta$ is {\it uniformly continuous}.
+I think we can derive a rather clean statement by assuming that $\eta$ is {\it uniformly continuous}.
 Recall that uniform continuity means that the quantitative relation between $\eps$ and $\delta$
 in the definition of continuity is uniform over all $x\in \X$ 
 (i.e.\ $(\forall \epsilon)(\exists\delta)(\forall x,y):d(x,y)<\delta \implies \lvert\eta(x)-\eta(y) \rvert<\epsilon$.)
-Assuming this should give us uniform convergence outside the boundary:
+Assuming this should give us uniform convergence of $g^*(x)\to g(x)$ for every $x$ outside the boundary of $\eta$:
 namely, that for any $\alpha>0$ there exists $n(\alpha)$ 
 such that if the algorithm is given $n(\alpha)$ samples then w.h.p it will predict like the Bayes optimal rule
-for every $x$ such that $\lvert\eta(x)\rvert \geq \alpha$, simultaneously. }
+for every $x$ such that $\lvert\eta(x)\rvert \geq \alpha$. }
 
 
 A key step towards proving Theorems~\ref{thm:pointwise-rate} and \ref{thm:uniform-rate} is to identify the subset of $\X$ that is likely to be correctly classified for a given number of training points $n$. This follows the rough outline of \cite{ChaudhuriDasgupta2014}, which gave rates of convergence for $k$-nearest neighbor, but there are two notable differences. First, we will see that the likely-correct sets obtained in that earlier work (for $k$-NN) are subsets of those we obtain for the new adaptive nearest neighbor procedure. Second, the proof for our setting is considerably more streamlined; for instance, there is no need to devise tie-breaking strategies for deciding the identities of the $k$ nearest neighbors.
+\shay{Perhaps add something about the uniform convergence statement which we use? 
+I think this is another interesting feature.}
 
 
 
@@ -429,7 +437,7 @@ Earlier work~\cite{ChaudhuriDasgupta2014} has established the universal consiste
 \end{equation}
 This is known to hold, for instance, in any finite-dimensional normed space or any doubling metric space~\cite[Chapter 1]{H01}.
 
-We will now see that this same condition implies the universal consistency of the adaptive nearest neighbor rule. To begin with, it implies that almost every point has positive advantage.
+We will now see that this same condition implies the universal consistency of the adaptive nearest neighbor rule. To begin with, it implies that almost every point has a positive advantage.
 \begin{lemma}
 Suppose metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Then,
 {\new{for any conditional expectation $\eta$}}, the set of points
@@ -448,58 +456,61 @@ Thus $x$ is $(p,\gamma)$-salient for $p = \mu(B(x,r_o)) > 0$ and $\gamma = \eta(
 
 Universal consistency follows as a consequence; the proof details are deferred to Section~\ref{sec:proof-outline}.
 \begin{theorem}[Universal consistency]
-Suppose the metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\lim_{n \rightarrow \infty} \delta_n = 0$, (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$, and (3) $\lim_{N \rightarrow \infty} \sum_{n \geq N} \delta_n = 0$. Let the classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the adaptive nearest neighbor procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
+Suppose the metric measure space $(\X, d, \mu)$ satisfies condition~(\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\lim_{n \rightarrow \infty} \delta_n = 0$, (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$, and (3) $\lim_{N \rightarrow \infty} \sum_{n \geq N} \delta_n = 0$. Let the classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the $\algname$ procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
 \label{thm:universal-consistency}
 \end{theorem}
+\textcolor{red}{Shay: Item (3) is equivalent to $\sum_n \delta_n < \infty$.
+Thus, we can replace items (1), (2), and (3) with: 
+``Let $(\delta_n)$ be a sequence in $[0,1]$ such that (1) $\sum_n \delta_n < \infty$ and (2) $\delta_n = \omega(2^{-n})$'', which is somewhat easier to read.}
+
+
 
 
 \section{Experiments}
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics[width=6in]{figs/combined_figure.png}
+\includegraphics[width=0.9\linewidth, height=1.8in]{figs/combined_figure.png}
 \end{center}
-\caption{Results from an experiment comparing the performance of $k$-NN
-  on the MNIST data set for different levels of random label noise $p$
+\caption{%Results from an experiment comparing the 
+  Effect of label noise on $k$-NN.
+  Performance on MNIST for different levels of random label noise $p$
   and for different values of $k$. Each line in the figure on the left {\bf (a)}
   represents the performance of $k$-NN as a function of $k$ for a
   given level of noise. Observe that the optimal choice of $k$
   increases with the noise level, and that the performance degrades
-  severely of a too-small value of $k$ is used. The table on the right {\bf (b)}
-  shows that AKNN, with a fixed value of $A$, performs almost as well
-  as $k$-NN with the optimal choice of $k$}
+  severely if a too-small value of $k$ is used. The table on the right {\bf (b)}
+  shows that $\algname$, with a fixed value of $A$, performs almost as well
+  as $k$-NN with the optimal choice of $k$.}
 \label{fig:mnist}
 \end{figure}
 
 \newcommand{\labels}{\mathcal{Y}}
 
-We present a few preliminary  experiments using real-world
-data. 
-For our experiments we made a few practical alterations to the algorithm
-described in figure~\ref{fig:alg}.
+We performed a few experiments using real-world datasets from computer vision and genomics (see Section \ref{sec:experimentappendix}). 
+These were conducted with some practical alterations to the algorithm described in Figure~\ref{fig:alg}. 
 
 %\begin{itemize}
 %\item
-{\bf First,} we extend the algorithm to
-multi-class. Suppose the set of possible labels is  $\labels$. We
+%{\bf First,} we extend the algorithm to multi-class. 
+{\bf Multiclass extension:} Suppose the set of possible labels is  $\labels$. We
 replace the binary rule ``find the smallest $k$ such that $\left|\eta_n(B_k(x))\right| >
-\Delta(n, k,\delta)$ with the rule: ``find the smallest $k$ such that
-for some $y \in \labels$, $\left|\eta^y_n(B_k(x))\right| - \frac{1}{|\labels|}>
-\Delta(n, k,\delta)$ where $\eta^y_n(S) \doteq \frac{\#_n\{x_i \in S
-    \mbox{ and } y_i = y\}}{\#_n(S)}$ \newline
-{\bf Second,} we replace Equation~(\ref{eq:delta-default}) with a simple one:
-$\Delta = \frac{A}{\sqrt{k}}$, where $A$ is a {\em confidence}
-parameter. \newline
-{\bf Third,} our algorithm can output answers that are not a single
-label. The output can be ``?'', which indicates that no label has
-sufficient evidence. It can also be a subset of $\labels$ that
-contains more than one element, indicating that that more than one
-label has significant evidence. In some situations using subsets of
-the labels is more infrmative. However, when we want to compare
-head-to-head with $k$-NN we need to output a single label. We use a
-simple heuristic to break such ties. The heuristic is to use the label
-$y \in \labels$ for which $\max_k \eta^y_n(B_k(x))/\sqrt{k}$ is
-largest.
+\Delta(n, k,\delta)$ with the rule: ``find the smallest $k$ such that $\eta^y_n(B_k(x)) - \frac{1}{|\labels|}>
+\Delta(n, k,\delta)$ for some $y \in \labels$,  where $\eta^y_n(S) \doteq \frac{\#_n\{x_i \in S
+    \mbox{ and } y_i = y\}}{\#_n(S)}$.
+    \newline
+%{\bf Second,} w
+{\bf Parametrization:} 
+We replace Equation~(\ref{eq:delta-default}) with $\Delta = \frac{A}{\sqrt{k}}$, where $A$ is a {\em confidence} parameter. \newline
+%{\bf Third,} 
+{\bf Resolving multilabel predictions:} 
+Our algorithm can output answers that are not a single label. 
+The output can be ``?'', which indicates that no label has sufficient evidence. 
+It can also be a subset of $\labels$ that contains more than one element, indicating that more than one label has significant evidence. 
+In some situations, using subsets of the labels is more informative. 
+However, when we want to compare head-to-head with $k$-NN, we need to output a single label. 
+We use a heuristic to predict with a single label $y \in \labels$ on any $x$: the label for which $\max_k \eta^y_n(B_k(x))/\sqrt{k}$ is largest.
+%{\bf Computation:} We computed the 
 %  \end{itemize}
 
 
@@ -507,19 +518,65 @@ largest.
 
 These experiments demonstrate the following:
 \begin{itemize}
-\item AKNN performs almost as well as $k$-NN with the optimal choice
-  of $k$
-\item On some datasets AKNN is {\em better} than $k$-NN with the
-  optimal choice of $k$. We explain this by the ability of $AKNN$ to
+\item $\algname$ performs almost as well as $k$-NN with the optimal choice
+  of $k$.
+\item On some datasets $\algname$ is {\em better} than $k$-NN with the
+  optimal choice of $k$. We explain this by the ability of $\algname$ to
   use different values of $k$ for different parts of the data.
-\item AKNN has a natural ``confidence'' parameter, which can be used
-  to trade-off error rate with the probability of abstaining
-  (outputing ``?''.
+\item $\algname$'s natural ``confidence'' parameter $A$ can be used
+  to trade off error rate with the probability of abstaining
+  (output ``?'').
 \end{itemize}
 
+\akshay{The above overlaps significantly with what's written below. The below text refers to a couple of figures in the appendix but only to make more trivial points.
+}
 
-\paragraph*{Varying the confidence parameter $A$ controls abstaining}
-The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figures \ref{fig:abst-vs-acc} and \ref{fig:varyingparam}.
+
+
+\paragraph*{$\algname$ is comparable to the best $k$-NN rule.}
+
+The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
+
+
+
+\begin{figure}
+    \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnvsknn.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnfrac.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+  \centering
+\caption{Performance of $\algname$ on notMNIST.
+  These figures relate several performance measures to $k$ - the
+  number of neighbors used to make the prediction. The black curve on
+  the LHS represents the accuracy of $k$-NN as a function of $k$. The
+  dashed horizontal line represents the best accuracy that is achieved
+  by $k$-NN (for $k \approx 10$). The three colored curves on the LHS
+  represent the accuracy of $\algname$ for three different values of the
+  confidence parameter $A$. The accuracy at a given $k$ is the
+  accuracy for the set of examples where $\algname$ chose the number of
+  neighbors to be smaller or equal to $k$. For the same three $\algname$ classifiers, the graphs on the RHS represent the coverage (the CDF of the predicted $k$-values). When $A$ is 3 or 9,
+  smaller values of $k$ yield no coverage. Observe that the curves on
+  the LHS start at the values of $k$ that the coverage increases from
+  zero. Of particular interest is the red curve, which corresponds to
+  $\algname$ with $A=1$. 
+  This curve shows that without restricting $k$, the learned classifier achieves full coverage and higher accuracy than the best achieved by $k$-NN.
+  %This curve reaches full coverage when $k$ is unrestricted and, when unrestricted, achieves 
+  }
+
+  % \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
+  
+  \label{fig:aknnvsknn}
+\end{figure}
+
+
+\paragraph*{Varying the confidence parameter $A$ controls abstaining.}
+The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figure \ref{fig:varyingparam}.
 
 % \begin{figure}
 %     \centering
@@ -560,124 +617,25 @@ The parameter $A$ controls how conservative the algorithm is deciding to abstain
 
 
 
-\paragraph*{Adaptively chosen neighborhood sizes reflect local confidence}
+\paragraph*{Adaptively chosen neighborhood sizes reflect local confidence.}
 
 The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict at all (Fig. \ref{fig:varyingadak}).
 
-\iffalse
+
 \begin{figure}
     \centering
-    \begin{subfigure}[t]{0.30\textwidth}
+    \begin{subfigure}[t]{0.95\textwidth}
     \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_labels.png} 
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_Aeq4_fig.png}
         %\caption{Price regulation} \label{fig:timing3}
     \end{subfigure}
     %\hfill
-    \begin{subfigure}[t]{0.30\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq9.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.34\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-  \caption{Labels (left) and $\algname$ predictions (center \& right) on notMNIST}
-  \label{fig:varyingparam}
-\end{figure}
-
-
-
-
-
-\begin{figure}
-    \begin{subfigure}[t]{0.32\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq0.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq1.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq4.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-    \hfill
-    
-    \begin{subfigure}[t]{0.32\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq6.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq8.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-    \hfill
-  \caption{$\algname$ neighborhood sizes on notMNIST, in increasing order of $A$, plotted on a log scale. Top left figure ($A = 0$) represents a $1$-NN classifier. Bottom right figure ($A = 15$) shows that many of the points' neighborhoods are maximally large, which can be compared to the right panel of Fig. \ref{fig:varyingparam}.}
+  \caption{Results of $\algname$ on notMNIST. At left is a plot of the $\algname$ predictions on notMNIST, with erroneous predictions highlighted as darker and larger points. At right are the corresponding adaptively chosen neighborhood sizes. Note that many of the erroneous predictions are in fairly homogeneous label clusters, and have low adaptive-$k$ values. The large-neighborhood points are those near disagreement regions.}
   \label{fig:varyingadak}
 \end{figure}
-\fi
 
 
-\paragraph*{$\algname$ is comparable to the best $k$-NN rule}
-
-The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
-
-
-
-\begin{figure}
-    \begin{subfigure}[t]{0.49\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnvsknn.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_aknnfrac.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-  \centering
-\caption{Figures depicting the performance of AKNN on notMNIST.
-  These figures relate several performance measures to $k$ - the
-  number of neighbors used to make the prediction. The black curve on
-  the LHS represents the accuracy of $k$-NN as a function of $k$. The
-  dotted horizontal line represents the best accuracy that is achieved
-  by $k$-NN for $k \approx 10$. The three colored curves on the LHS
-  represents the accuracy of AKNN for three different values of the
-  confidence parameter $A$. The accuracy at a given $k$ is the
-  accuracy for the set of examples where AKNN chose the number of
-  neighbors to be smaller or equal to $k$. The graphs on the RHS
-  represent the converage of the same AKNN runs. When $A$ is 3 or 9,
-  smaller values of $k$ yield no coverage. Observe that the curvess on
-  the LHS start at the values of $k$ that the coverage increases from
-  zero. Of particular interest is the red curve, that corresponds to
-  AKNN wirth $A=1$. This curves reaches full coverage when $k$ is
-  unrestricted and, when unrestricted, achieves higher accuracy the
-  best accuracy achieve by $ki$-NN.}
-
-  
-  % \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
-  \label{fig:aknnvsknn}
-\end{figure}
-
-
-
-
-
-
-
-
-
-
+\paragraph*{Web interface.} The local interplay between performance, the adaptive $k$, and $A$ in our experiments can be viewed interactively at \texttt{http://35.239.251.24/aknn/}.
 
 
 
@@ -733,7 +691,7 @@ that we present and prove in \Cref{sec:ucecm}.
 
 \begin{theorem*}[\Cref{thm:pointwise-rate} restatement] 
 There is an absolute constant $C > 0$ for which the following holds.
-Let $0 < \delta < 1$ denote the confidence parameter in the AKNN algorithm (\Cref{fig:alg}),
+Let $0 < \delta < 1$ denote the confidence parameter in the $\algname$ algorithm (\Cref{fig:alg}),
 and suppose the algorithm is used to define a classifier $g_n$ based on $n$ training points chosen i.i.d.\ from $P$. 
 Then, for every point $x\in\supp(\mu)$, if
 \[n \geq \frac{C}{\adv(x)} \max \left( \log \frac{1}{\adv(x)}, \ \log \frac{1}{\delta} \right)\]
@@ -764,7 +722,7 @@ By the definition of advantage, point $x$ is $(p,\gamma)$-salient for some $p,\g
 \end{equation}
 or equivalently that $n \cdot \adv(x) \geq 4c_2^2 (\log n + \log (1/\delta))$.
 
-Set $k = np/(1 + o)$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + o \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
+Set $k = np/(1 + w)$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + w \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
 \begin{align*}
 \eta_n(B) &\geq \ \eta(B) - \Delta(n, k, \delta)
 = \gamma - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
@@ -778,6 +736,9 @@ At the same time, for any ball $B' = B(x, r)$ with $r < r_p(x)$,
 $$ \eta_n(B') \geq \eta(B') - \Delta(n, \#_n(B'), \delta) > -\Delta(n, \#_n(B'), \delta) $$
 and thus no such ball will trigger a prediction of $-1$. Therefore, the prediction at $x$ must be $+1$.
 \end{proof}
+
+
+
 \subsection{Proof of Theorem~\ref{thm:uniform-rate}}
 
 This proof follows much the same outline as that of Theorem~\ref{thm:pointwise-rate}. A crucial difference is that uniform large deviation bounds (Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}) are applied to the class of all balls in $\X$, which is assumed\footnote{This is motivated by finite-dimensional Euclidean space $\mathbb{R}^{D}$, where it holds with $d_0 = D+1$ (\cite{dudley79}).} to have finite VC dimension $d_0$. In contrast, the proof of Theorem~\ref{thm:pointwise-rate} only applies these bounds to the class of balls centered at a specific point, which has VC dimension at most 1 in any metric space.
@@ -790,14 +751,14 @@ This proof follows much the same outline as that of Theorem~\ref{thm:pointwise-r
 
 Recall from (\ref{eq:advantage-set}) that $\X_a$ denotes the set of points with advantage $> a$.
 \begin{lemma}
-Pick any $0 < \delta < 1$ as a confidence parameter for the AKNN estimator of Figure~\ref{fig:alg}. Fix any $a > 0$. If the number of training points $n$ satisfies
+Pick any $0 < \delta < 1$ as a confidence parameter for the $\algname$ estimator of Figure~\ref{fig:alg}. Fix any $a > 0$. If the number of training points $n$ satisfies
 $$ n \geq \frac{c_3}{a} \max\left(\log \frac{c_3}{a}, \ \log \frac{1}{\delta} \right), $$
 then with probability at least $1-\delta$, the resulting classifier $g_n$ has risk
 $$ R(g_n) - R^* \leq \delta + \mu(\X_0 \setminus \X_a) .$$
 \label{lemma:advantage-set-convergence}
 \end{lemma}
 \begin{proof}
-From Lemma~\ref{lemma:pointwise}, we have that for any $x \in \X_a$, 
+From Theorem~\ref{thm:pointwise-rate} \akshay{TODO This lemma should be restated using the constant $C$ from Thm. \ref{thm:pointwise-rate} instead of $c_3$}, we have that for any $x \in \X_a$, 
 $$ \pr_n(g_n(x) \neq g^*(x)) \leq \delta^2 ,$$
 where $\pr_n$ denotes probability over the choice of training points. Thus, for $X \sim \mu$,
 $$ \E_n \E_X 1(g_n(X) \neq g^*(X) | X \in \X_a) \leq \delta^2 ,$$
@@ -1472,7 +1433,7 @@ which finishes the proof.
 %
 
 
-
+\iffalse
 \section{High-probability convergence}
 
 In this section, we make a further assumption that allows us to strengthen \Cref{thm:general-error-bound}: 
@@ -1557,8 +1518,12 @@ and thus no such ball will trigger a prediction of $-1$. Therefore, the algorith
 
 The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically. 
 \end{proof}
+\fi
+
+
 
 \section{Experimental Results}
+\label{sec:experimentappendix}
 
 \subsection{Datasets}
 
@@ -1566,7 +1531,128 @@ We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extr
 
 We also test on the MNIST dataset. \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
 
-We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving single-cell gene expression data from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}). The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Each approach has its own ill-understood set of technical biases, and discriminating between the two to identify these biases is currently of great interest.
+We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving gene expression data on a population single cells from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}, as processed in \cite{MouseAtlasData}). The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Though both approaches measure effectively the same cells for our purposes, each approach has its own set of technical biases, about which much is unknown. Discriminating between the two approaches to identify these biases is currently of great interest.
+
+
+\newpage
+\subsection{Supplemental Figures}
+
+\begin{figure}
+    \begin{subfigure}[t]{0.30\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq4.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq9.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.34\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+  \caption{$\algname$ predictions on notMNIST.}
+  \label{fig:varyingparam}
+\end{figure}
+
+\begin{figure}
+    \begin{subfigure}[t]{0.32\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq0.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq1.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq4.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+    
+    \begin{subfigure}[t]{0.32\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq6.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq8.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+  \caption{$\algname$ neighborhood sizes on notMNIST, in increasing order of $A$, plotted on a log scale. Top left figure ($A = 0$) represents a $1$-NN classifier. Bottom right figure ($A = 15$) shows that many of the points' neighborhoods are maximally large, which can be compared to the right panel of Fig. \ref{fig:varyingparam}.}
+  \label{fig:varyingadak}
+\end{figure}
+
+
+
+\begin{figure}
+    \begin{subfigure}[t]{0.30\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq4.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq9.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.34\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+  \caption{$\algname$ predictions on mouse single-cell data.}
+  \label{fig:varyingparam}
+\end{figure}
+
+\begin{figure}
+    \begin{subfigure}[t]{0.32\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq0.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq1.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq4.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+    
+    \begin{subfigure}[t]{0.32\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq6.png} 
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq8.png} 
+        %\caption{Competitors} \label{fig:timing2}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+    \end{subfigure}
+    \hfill
+  \caption{As Fig. \ref{fig:varyingadak}, on single-cell mouse data.}
+  \label{fig:varyingadak_muris}
+\end{figure}
+
+
+
 
 
 \end{document}
