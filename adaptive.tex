@@ -103,7 +103,7 @@ Shay Moran\\
 \maketitle
 
 \begin{abstract}
-We introduce a variant of the $k$-nearest-neighbors classifier. The main advantage of our variant is that $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger $k$ for predicting the labels of points in noisy regions.)  
+We introduce a variant of the $k$-nearest-neighbor classifier, in which $k$. The main advantage of our variant is that $k$ is chosen by the algorithm, rather than supplied as a parameter. In addition, the choice of $k$ depends on properties of each neighborhood, and therefore may significantly vary between different points. (For example, the algorithm will use larger $k$ for predicting the labels of points in noisy regions.)  
 
 We provide theory and experiments that demonstrate that the algorithm performs comparably to $k$-NN with an optimal choice of $k$\akshay{, and sometimes better}. In particular, we derive bounds on the convergence rates of our classifier that depend on a local quantity we call the ``advantage'' which is significantly weaker than the Lipschitz conditions used in previous convergence rate proofs. These generalization bounds hinge on a variant of the seminal Uniform Convergence Theorem due to Vapnik and Chervonenkis; this variant concerns conditional probabilities and may be of independent interest. 
 \end{abstract}
@@ -1606,9 +1606,10 @@ We use $\algname$ on a challenging binary classification task of independent and
         \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
     \end{subfigure}
     \hfill
-  \caption{$\algname$ predictions on mouse single-cell data.}
-  \label{fig:varyingparam}
+  \caption{As Fig. \ref{fig:varyingparam}, on single-cell mouse data.}
+  \label{fig:varyingparam_muris}
 \end{figure}
+
 
 \begin{figure}
     \begin{subfigure}[t]{0.32\textwidth}
