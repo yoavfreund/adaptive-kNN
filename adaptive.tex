@@ -269,11 +269,15 @@ Given:
 \vspace{.1in}
 To predict at $x \in \X$:
 \begin{itemize}
-\item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
+\item For any integer $k$, let $B_k(x)$ denote the smallest ball
+  centered at $x$ that contains exactly $k$ training
+  points.~\footnote{When several points have the same distance to $x$
+    there might be some values of $k$ for which $B_k(x)$ is
+    undefined. Our algorithm skips such values of $k$.}
 \item Find the smallest $0 < k \leq n$ for which the $B_k(x)$ has a
-  {\em significant bias}: that is,~$\left|\eta_n(B_k(x))\right| > \Delta(n, \#_n(B_k(x)),\delta)$, where
+  {\em significant bias}: that is,~$\left|\eta_n(B_k(x))\right| > \Delta(n, k,\delta)$, where
 \begin{equation}
-\Delta(n,m,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{m}}.
+\Delta(n,k,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{k}}.
 \label{eq:delta-default}
 \end{equation}
 \item If there exists such a ball, return label $\sign(\eta_n(B_k(x)))$.
@@ -291,7 +295,7 @@ The adaptive $k$-NN algorithm (AKNN) is shown in Figure~\ref{fig:alg}. It makes 
 
 Later, we will also discuss a variant of this algorithm in which a modified confidence interval,
 \begin{equation}
-\Delta(n,m,\delta) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{m}},
+\Delta(n,k,\delta) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{k}},
 \label{eq:delta-modified}
 \end{equation}
 is used, where $d_0$ is the VC dimension of balls in $(\X,d)$. 
@@ -300,13 +304,13 @@ is used, where $d_0$ is the VC dimension of balls in $(\X,d)$.
 
 We now provide finite-sample rates of convergence for the adaptive nearest neighbor rule. For simplicity, we give convergence rates that are specific to any query point $x$ and that depend on a suitable notion of the ``margin'' of distribution $P$ around $x$.
 
-Pick any $p, \gamma > 0$. Recalling definition (\ref{eq:probability-radius}), we say a point $x \in \X$ is $(p, \gamma)$-salient if either of the following two conditions hold:
+Pick any $p, \gamma > 0$. Recalling definition
+(\ref{eq:probability-radius}), we say a point $x \in \X$ is $(p,
+\gamma)$-salient
+if the following holds for either $s=+1$ or $s=-1$:
 \begin{itemize}
-\item $\eta(x) > 0$, and $\eta(B(x,r)) > 0$ for all $r \in [0,r_p(x))$, and $\eta(B(x,r_p(x))) \geq \gamma$ \qquad OR
-% \end{itemize}
-% or
-% \begin{itemize}
-\item $\eta(x) < 0$, and $\eta(B(x,r)) < 0$ for all $r \in [0,r_p(x))$, and $\eta(B(x,r_p(x))) \leq -\gamma$.
+\item $s \eta(x) > 0$, and $s \eta(B(x,r)) > 0$ for all $r \in
+  [0,r_p(x))$, and $s \eta(B(x,r_p(x))) \geq s \gamma$
 \end{itemize}
 A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The {\it advantage} of $x$ is taken to be the largest value of $p\gamma^2$ over all such pairs:
 \begin{equation}
@@ -451,61 +455,116 @@ Suppose the metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:leb
 
 \section{Experiments}
 
-We test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. Some datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=6in]{figs/combined_figure.png}
+\end{center}
+\caption{Results from an experiment comparing the performance of $k$-NN
+  on the MNIST data set for different levels of random label noise $p$
+  and for different values of $k$. Each line in the figure on the left {\bf (a)}
+  represents the performance of $k$-NN as a function of $k$ for a
+  given level of noise. Observe that the optimal choice of $k$
+  increases with the noise level, and that the performance degrades
+  severely of a too-small value of $k$ is used. The table on the right {\bf (b)}
+  shows that AKNN, with a fixed value of $A$, performs almost as well
+  as $k$-NN with the optimal choice of $k$}
+\label{fig:mnist}
+\end{figure}
+
+\newcommand{\labels}{\mathcal{Y}}
+
+We present a few preliminary  experiments using real-world
+data. 
+For our experiments we made a few practical alterations to the algorithm
+described in figure~\ref{fig:alg}.
+
+%\begin{itemize}
+%\item
+{\bf First,} we extend the algorithm to
+multi-class. Suppose the set of possible labels is  $\labels$. We
+replace the binary rule ``find the smallest $k$ such that $\left|\eta_n(B_k(x))\right| >
+\Delta(n, k,\delta)$ with the rule: ``find the smallest $k$ such that
+for some $y \in \labels$, $\left|\eta^y_n(B_k(x))\right| - \frac{1}{|\labels|}>
+\Delta(n, k,\delta)$ where $\eta^y_n(S) \doteq \frac{\#_n\{x_i \in S
+    \mbox{ and } y_i = y\}}{\#_n(S)}$ \newline
+{\bf Second,} we replace Equation~(\ref{eq:delta-default}) with a simple one:
+$\Delta = \frac{A}{\sqrt{k}}$, where $A$ is a {\em confidence}
+parameter. \newline
+{\bf Third,} our algorithm can output answers that are not a single
+label. The output can be ``?'', which indicates that no label has
+sufficient evidence. It can also be a subset of $\labels$ that
+contains more than one element, indicating that that more than one
+label has significant evidence. In some situations using subsets of
+the labels is more infrmative. However, when we want to compare
+head-to-head with $k$-NN we need to output a single label. We use a
+simple heuristic to break such ties. The heuristic is to use the label
+$y \in \labels$ for which $\max_k \eta^y_n(B_k(x))/\sqrt{k}$ is
+largest.
+%  \end{itemize}
 
 
+% test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. Some datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
 
-\subsection{Varying the confidence parameter $A$ controls abstaining}
+These experiments demonstrate the following:
+\begin{itemize}
+\item AKNN performs almost as well as $k$-NN with the optimal choice
+  of $k$
+\item On some datasets AKNN is {\em better} than $k$-NN with the
+  optimal choice of $k$. We explain this by the ability of $AKNN$ to
+  use different values of $k$ for different parts of the data.
+\item AKNN has a natural ``confidence'' parameter, which can be used
+  to trade-off error rate with the probability of abstaining
+  (outputing ``?''.
+\end{itemize}
 
+
+\paragraph*{Varying the confidence parameter $A$ controls abstaining}
 The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figures \ref{fig:abst-vs-acc} and \ref{fig:varyingparam}.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\linewidth]{figs/notMNIST/notMNIST_accvsabst.png}
-  \caption{Abstain rate vs. accuracy on non-abstained points, plotted for $\algname$ on notMNIST. Each point represents the $\algname$ classifier learned with a different parameter $A$. The classifier is fairly indifferent to variation in $A$ at lower values, but at higher values increasing $A$ raises both the abstain rate and the accuracy on non-abstained points.}
-  \label{fig:abst-vs-acc}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.8\linewidth]{figs/notMNIST/notMNIST_accvsabst.png}
+%   \caption{Abstain rate vs. accuracy on non-abstained points, plotted for $\algname$ on notMNIST. Each point represents the $\algname$ classifier learned with a different parameter $A$. The classifier is fairly indifferent to variation in $A$ at lower values, but at higher values increasing $A$ raises both the abstain rate and the accuracy on non-abstained points.}
+%   \label{fig:abst-vs-acc}
+% \end{figure}
+
+% \begin{figure}
+% \fbox{\begin{minipage}{5.25in}
+% \vspace{.1in}
+% \begin{center}
+% \begin{minipage}{5in}
+% Given: 
+% \begin{itemize}
+% \item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \labels$
+% \item confidence parameter $A > 0$
+% \end{itemize}
+% \vspace{.1in}
+% To predict at $x \in \X$:
+% \begin{itemize}
+% \item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
+% \item Find the smallest $0 < k \leq n$ for which there exists a label $y \in \labels$ with respect to which $B_k(x)$ has a {\em significant bias}, that is,
+% \begin{equation}
+% \eta_n^{y} (B_k(x)) - \frac{1}{|\labels|} > \frac{A}{\sqrt{\#_n(B_k(x))}}.
+% \label{eq:delta-condition-impl}
+% \end{equation}
+% \item If there exists such a ball, return the $y$ with maximum bias.
+% \item If no such ball exists: return ``?''
+% \end{itemize}
+% \vspace{.1in}
+% \end{minipage}
+% \end{center}
+% \end{minipage}}
+% \caption{The adaptive $k$-NN (AKNN) classifier (multiclass, as implemented).}
+% \label{fig:alg_practical}
+% \end{figure}
 
 
 
-
-
-\begin{figure}
-\fbox{\begin{minipage}{5.25in}
-\vspace{.1in}
-\begin{center}
-\begin{minipage}{5in}
-Given: 
-\begin{itemize}
-\item training set $(x_1, y_1), \ldots, (x_n, y_n) \in \X \times \mathcal{Y}$
-\item confidence parameter $A > 0$
-\end{itemize}
-\vspace{.1in}
-To predict at $x \in \X$:
-\begin{itemize}
-\item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains at least $k$ training points.
-\item Find the smallest $0 < k \leq n$ for which there exists a label $y \in \mathcal{Y}$ with respect to which $B_k(x)$ has a {\em significant bias}, that is,
-\begin{equation}
-\eta_n^{y} (B_k(x)) - \frac{1}{|\mathcal{Y}|} > \frac{A}{\sqrt{\#_n(B_k(x))}}.
-\label{eq:delta-condition-impl}
-\end{equation}
-\item If there exists such a ball, return the $y$ with maximum bias.
-\item If no such ball exists: return ``?''
-\end{itemize}
-\vspace{.1in}
-\end{minipage}
-\end{center}
-\end{minipage}}
-\caption{The adaptive $k$-NN (AKNN) classifier (multiclass, as implemented).}
-\label{fig:alg_practical}
-\end{figure}
-
-
-
-\subsection{Adaptively chosen neighborhood sizes reflect local confidence}
+\paragraph*{Adaptively chosen neighborhood sizes reflect local confidence}
 
 The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict at all (Fig. \ref{fig:varyingadak}).
 
+\iffalse
 \begin{figure}
     \centering
     \begin{subfigure}[t]{0.30\textwidth}
@@ -566,9 +625,10 @@ The number of neighbors chosen by $\algname$ is a local quantity that gives a po
   \caption{$\algname$ neighborhood sizes on notMNIST, in increasing order of $A$, plotted on a log scale. Top left figure ($A = 0$) represents a $1$-NN classifier. Bottom right figure ($A = 15$) shows that many of the points' neighborhoods are maximally large, which can be compared to the right panel of Fig. \ref{fig:varyingparam}.}
   \label{fig:varyingadak}
 \end{figure}
+\fi
 
 
-\subsection{$\algname$ is comparable to the best $k$-NN rule}
+\paragraph*{$\algname$ is comparable to the best $k$-NN rule}
 
 The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
 
@@ -586,7 +646,26 @@ The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compar
         %\caption{Competitors} \label{fig:timing2}
     \end{subfigure}
   \centering
-  \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
+\caption{Figures depicting the performance of AKNN on notMNIST.
+  These figures relate several performance measures to $k$ - the
+  number of neighbors used to make the prediction. The black curve on
+  the LHS represents the accuracy of $k$-NN as a function of $k$. The
+  dotted horizontal line represents the best accuracy that is achieved
+  by $k$-NN for $k \approx 10$. The three colored curves on the LHS
+  represents the accuracy of AKNN for three different values of the
+  confidence parameter $A$. The accuracy at a given $k$ is the
+  accuracy for the set of examples where AKNN chose the number of
+  neighbors to be smaller or equal to $k$. The graphs on the RHS
+  represent the converage of the same AKNN runs. When $A$ is 3 or 9,
+  smaller values of $k$ yield no coverage. Observe that the curvess on
+  the LHS start at the values of $k$ that the coverage increases from
+  zero. Of particular interest is the red curve, that corresponds to
+  AKNN wirth $A=1$. This curves reaches full coverage when $k$ is
+  unrestricted and, when unrestricted, achieves higher accuracy the
+  best accuracy achieve by $ki$-NN.}
+
+  
+  % \caption{\textbf{Left: } $\algname$ performance on notMNIST, compared to the standard $k$-NN rule for different $k$. The standard $k$-NN rule is run as a baseline, and its performance is plotted as a function of the chosen $k$; as is typical, low values around $k \sim 10$ lead to the highest accuracy, marked by the dashed black line. The colored lines each plot the performance of $\algname$ restricted to points with adaptively chosen $k \leq m$, for neighborhood size $m$ on the abscissa. Each such line is decreasing, reflecting that $\algname$ predicts more accurately on points with lower adaptive-$k$. There is a substantial gap between the $\algname$ graphs and the fixed-$k$ graph; a value of $k$ is associated with a much more accurate prediction if chosen by $\algname$ than otherwise. Finally, setting the parameter $A$ aggressively enough to predict with small neighborhoods ($A=1$) surpasses the performance of the best fixed-$k$ rule. \textbf{Right: } Corresponding to the left panel, plotted is the fraction of points whose adaptively chosen $k$ is $\leq m$, for $m$ on the abscissa. Most points in this dataset have adaptively chosen neighborhood sizes as small as allowed by the parameter $A$. The left panel shows that such points are predicted with superior accuracy by $\algname$.}
   \label{fig:aknnvsknn}
 \end{figure}
 
@@ -1488,14 +1567,6 @@ We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extr
 We also test on the MNIST dataset. \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
 
 We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving single-cell gene expression data from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}). The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Each approach has its own ill-understood set of technical biases, and discriminating between the two to identify these biases is currently of great interest.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=6in]{figs/combined_figure.png}
-\end{center}
-\caption{Results from an experiment comparing the performance of k-NN on the MNIST data set for different noise levels $p$ and for different values of $k$. Note that the choice of $k$ has a large effect on the error, and that the larger the amount of noise $p$, the larger the value of $k$ needs to be.}
-\label{fig:mnist}
-\end{figure}
 
 
 \end{document}
