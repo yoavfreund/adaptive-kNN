@@ -202,7 +202,6 @@ bounds for this classifier, and compare them with previous bounds in the $k$-NN 
 These bounds exploit a general VC-based uniform convergence statement
 which is presented and proved in a self-contained manner in \Cref{sec:ucecm}.
 
-
 \section{Setup}\label{sec:setup}
 
 Take the instance space to be a separable metric space $(\X, d)$ and the label space to be $\Y = \{\pm 1\}$. All data are assumed to be drawn i.i.d.\ from a fixed unknown distribution $P$ over $\X \times \Y$.
@@ -485,7 +484,7 @@ until one of the labels has an overwhelming majority of, say $n$. This makes no 
     For comparison, we plot the performance of $k$-NN as a function of $k$. 
     The highest accuracy ($\approx$ 0.88) is achieved for $k=10$ (dotted horizontal line), and is surpassed by $\algname$ with high coverage (100\% for $A=1$). %Interestingly, for this dataset both $A=1$ and $A=3$ achieve 100\% coverage and a precision of 89.3\%
     \end{minipage} 
-    \caption{Performance of $\algname$ on notMNIST. See also Fig. \ref{fig:aknnvsknn}.}
+    \caption{Performance of $\algname$ on notMNIST. See also Figure \ref{fig:varyingadak}.}
     \label{fig:aknnvsknn}
 \end{figure}
 
@@ -1517,7 +1516,7 @@ The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically.
 
 We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extracted glyphs of the letters A-J from publicly available fonts. We use the 18724 labeled examples from this set, preprocessed feature-wise to be in $[-\frac{1}{2}, \frac{1}{2}]$ using $x \mapsto \frac{x}{255} - \frac{1}{2}$.
 
-We also test on the MNIST dataset. \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
+We also test on the MNIST dataset (\cite{MNIST}). \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
 
 We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving gene expression data on a population single cells from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}, as processed in \cite{MouseAtlasData}). This constitutes 45291 cells (training examples). Each cell has its data collected using one of two approaches. The task is to classify between them. 
 
