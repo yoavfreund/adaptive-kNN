@@ -399,6 +399,9 @@ Assuming this should give us uniform convergence of $g^*(x)\to g(x)$ for every $
 namely, that for any $\alpha>0$ there exists $n(\alpha)$ 
 such that if the algorithm is given $n(\alpha)$ samples then w.h.p it will predict like the Bayes optimal rule
 for every $x$ such that $\lvert\eta(x)\rvert \geq \alpha$. }
+\yoav{I think that continuity is a sufficient, but not a necessary condition, you can have
+  significant advantage everywhere and continuity nowhere - just add
+  $\epsilon>0$ to $\eta$ on some dense set of measure zero.}
 
 
 A key step towards proving Theorems~\ref{thm:pointwise-rate} and \ref{thm:uniform-rate} is to identify the subset of $\X$ that is likely to be correctly classified for a given number of training points $n$. This follows the rough outline of \cite{ChaudhuriDasgupta2014}, which gave rates of convergence for $k$-nearest neighbor, but there are two notable differences. First, we will see that the likely-correct sets obtained in that earlier work (for $k$-NN) are subsets of those we obtain for the new adaptive nearest neighbor procedure. Second, the proof for our setting is considerably more streamlined; for instance, there is no need to devise tie-breaking strategies for deciding the identities of the $k$ nearest neighbors.
@@ -426,6 +429,10 @@ In contrast, the work of \cite{ChaudhuriDasgupta2014} showed that with $n$ train
 Such points are $(k/n, k^{-1/2})$-salient and thus have advantage at least $1/n$. In fact,
 $$ \bigcup_{1 \leq k \leq n} \X'_{n,k} \subseteq \X_{1/n} .$$
 In this formal sense, the adaptive nearest neighbor procedure is able to perform as well as all choices of $k$ simultaneously.
+\yoav{In fact, in my experiments, AKNN performs {\em almost} as well
+  as the best choice of $k$. Can we acount for this difference? We
+  need to make a statement that does not contradict the expriments...}
+
 
 \section{Universal consistency}\label{sec:gen2}
 \label{sec:universal-consistency}
@@ -512,37 +519,50 @@ It can also be a subset of $\labels$ that contains more than one element, indica
 In some situations, using subsets of the labels is more informative. 
 However, when we want to compare head-to-head with $k$-NN, we need to output a single label. 
 We use a heuristic to predict with a single label $y \in \labels$ on any $x$: the label for which $\max_k \eta^y_n(B_k(x))/\sqrt{k}$ is largest.
+
+\pagebreak
+
+
+
 %{\bf Computation:} We computed the 
 %  \end{itemize}
 
 
 % test the adaptive nearest-neighbor rule on several datasets. As we are given a fixed training set of size $n$, the significance threshold $\Delta \propto \frac{1}{\sqrt{m}}$ is only dependent on $\delta$. So we parametrize the algorithm by a single positive value $A$, such that $\Delta = \frac{A}{\sqrt{m}}$. Some datasets are multiclass, for which we also implement a multiclass version of $\algname$ (Figure \ref{fig:alg_practical}).
 
-These experiments demonstrate the following:
-\begin{itemize}
-\item $\algname$ performs almost as well as $k$-NN with the optimal choice
-  of $k$.
-\item On some datasets $\algname$ is {\em better} than $k$-NN with the
-  optimal choice of $k$. We explain this by the ability of $\algname$ to
-  use different values of $k$ for different parts of the data.
-\item $\algname$'s natural ``confidence'' parameter $A$ can be used
-  to trade off error rate with the probability of abstaining
-  (output ``?'').
-\end{itemize}
+% These experiments demonstrate the following:
+% \begin{itemize}
+% \item $\algname$ performs almost as well as $k$-NN with the optimal choice
+%   of $k$.
+% \item On some datasets $\algname$ is {\em better} than $k$-NN with the
+%   optimal choice of $k$. We explain this by the ability of $\algname$ to
+%   use different values of $k$ for different parts of the data.
+% \item $\algname$'s natural ``confidence'' parameter $A$ can be used
+%   to trade off error rate with the probability of abstaining
+%   (output ``?'').
+% \end{itemize}
 
-\akshay{The above overlaps significantly with what's written below. The below text refers to a couple of figures in the appendix but only to make more trivial points.
-}
+% \akshay{The above overlaps significantly with what's written below. The below text refers to a couple of figures in the appendix but only to make more trivial points.
+% }
 
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}{0.95\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/umapnotMNIST_combined.png}
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    %\hfill
+    \caption{ A visualization of the performance of AKNN on notMNIST.
+      {\bf (a)} The correct labels. {\bf (b)} The value of $k$ chosen
+      by the algorithm when predicting each datapoint. Zooming in
+      would reveal more details. For an interactive point your browser
+    to \texttt{http://35.239.251.24/aknn/}}
+  \label{fig:varyingadak}
+\end{figure}
 
-
-\paragraph*{$\algname$ is comparable to the best $k$-NN rule.}
-
-The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. We see this in practice as well (Fig. \ref{fig:aknnvsknn}). 
-
-
-
-\begin{figure}
-    \begin{minipage}{0.49\textwidth}
+\begin{figure}[th]
+    \begin{minipage}{0.52\textwidth}
     \centering
         \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_combinedGraphs.png}
         \caption{\small Performance of $\algname$ on notMNIST for three different
@@ -550,7 +570,7 @@ The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compar
           function of the neighborhood size.}
       \end{minipage}
       \hspace{0.2cm}
-      \begin{minipage}{0.49\textwidth}
+      \begin{minipage}{0.46\textwidth}
         \begin{small}
           For each confidence level we show two graphs: an accuracy
           graph (solid lines) and a coverage line (dashed line). for
@@ -569,9 +589,31 @@ The discussions of Section \ref{sec:knn-comparison} prove that $\algname$ compar
   \label{fig:aknnvsknn}
 \end{figure}
 
+We briefly discuss our main conclusions from the experiments.
 
+\paragraph*{$\algname$ is comparable to the best $k$-NN rule.}
+In Section~\ref{sec:knn-comparison} we prove that $\algname$ compares
+favorably to $k$-NN with any fixed $k$. We see this in practice as
+well (Fig. \ref{fig:aknnvsknn}).
 \paragraph*{Varying the confidence parameter $A$ controls abstaining.}
-The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias. This is illustrated in Figure \ref{fig:varyingparam}.
+The parameter $A$ controls how conservative the algorithm is deciding
+to abstain, instead of incurring error by predicting. $A \to 0$
+represents the most aggressive setting, in which the algorithm never
+abstains, essentially predicting according to a $1$-NN rule. Higher
+settings of $A$ cause the algorithm to abstain on some of these
+predicted points, for which there is no sufficiently small
+neighborhood with a sufficiently significant label bias. This is
+illustrated in Figure \ref{fig:varyingparam}.
+\paragraph*{Adaptively chosen neighborhood sizes reflect local confidence.}
+The number of neighbors chosen by $\algname$ is a local quantity that
+gives a pointwise measure of the confidence associated with label
+predictions. Small neighborhoods are chosen when one label is measured
+as significant nearly as soon as statistically possible; by definition
+of the $\algname$ stopping rule, this is not true where large
+neighborhoods are necessary. Furthermore, higher settings of $A$
+increase the size of the neighborhood required to predict at all
+(Fig. \ref{fig:varyingadak}).
+
 
 % \begin{figure}
 %     \centering
@@ -611,26 +653,7 @@ The parameter $A$ controls how conservative the algorithm is deciding to abstain
 % \end{figure}
 
 
-
-\paragraph*{Adaptively chosen neighborhood sizes reflect local confidence.}
-
-The number of neighbors chosen by $\algname$ is a local quantity that gives a pointwise measure of the confidence associated with label predictions. Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. Furthermore, higher settings of $A$ increase the size of the neighborhood required to predict at all (Fig. \ref{fig:varyingadak}).
-
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[t]{0.95\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_Aeq4_fig.png}
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    %\hfill
-  \caption{Results of $\algname$ on notMNIST. At left is a plot of the $\algname$ predictions on notMNIST, with erroneous predictions highlighted as darker and larger points. At right are the corresponding adaptively chosen neighborhood sizes. Note that many of the erroneous predictions are in fairly homogeneous label clusters, and have low adaptive-$k$ values. The large-neighborhood points are those near disagreement regions.}
-  \label{fig:varyingadak}
-\end{figure}
-
-
-\paragraph*{Web interface.} The local interplay between performance, the adaptive $k$, and $A$ in our experiments can be viewed interactively at \texttt{http://35.239.251.24/aknn/}.
+%\paragraph*{Web interface.} The local interplay between performance, the adaptive $k$, and $A$ in our experiments can be viewed interactively at \texttt{http://35.239.251.24/aknn/}.
 
 
 
