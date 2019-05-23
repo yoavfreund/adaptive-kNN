@@ -74,8 +74,8 @@
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-\newcommand{\comment}[3]{{\color{#1} {\bf #2 :} #3}}
-%\newcommand{\comment}[3]{}  % suppress comments
+%\newcommand{\comment}[3]{{\color{#1} {\bf #2 :} #3}}
+\newcommand{\comment}[3]{}  % suppress comments
 \newcommand{\new}[1]{\color{red} #1}
 \newcommand{\shay}[1]{\comment{purple}{Shay}{#1}}
 \newcommand{\akshay}[1]{\comment{blue}{Akshay}{#1}}
@@ -170,7 +170,7 @@ can pick the right $k$ in each neighborhood separately.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=3in]{figs/adaptive-rationale.pdf}
+\includegraphics[width=2.75in]{figs/adaptive-rationale.pdf}
 \end{center}
 \caption{For values of $x$ on the left half of the shown interval, the
   pointwise bias $\eta(x)$ is close to $-1$ or $1$, and thus a small value of $k$ will yield an accurate prediction. Larger $k$ will not do as well, because they may run into neighboring regions with different labels. For values of $x$ on the right half of the interval, $\eta(x)$ is close to $0$, and thus large $k$ is essential for accurate prediction.}
@@ -180,9 +180,6 @@ can pick the right $k$ in each neighborhood separately.
 Our estimator allows us to give rates of convergence that are tighter and more 
 transparent than those customarily obtained in nonparametric statistics. Specifically, for any point $x$ in the instance space $\X$, we define a notion of the {\it advantage at $x$}, denoted $\adv(x)$, which is rather like a local margin. We show that the prediction at $x$ is very likely to be correct once the number of training points exceeds~$\tilde{O}(1/\adv(x))$. Universal consistency follows by establishing that almost all points have positive advantage.
 
-\textcolor{red}{{\bf Yoav:} I would add to this figure something to indicate that
-points that are far from the boundary converge faster.}
-  
 \subsection{Relation to other work in nonparametric estimation}
 
 For linear separators and many other {\it parametric} families of classifiers, it is possible to give rates of convergence that hold without any assumptions on the input distribution $\mu$ or the conditional expectation function $\eta$. This is not true of nonparametric estimation: although any target function can in principle be captured, the number of samples needed to achieve a specific level of accuracy will inevitably depend upon aspects of this function such as how fast it changes~\cite[chapter 7]{DGL96}. As a result, nonparametric statistical theory has focused on (1) asymptotic consistency, ideally without assumptions, and (2) rates of convergence under a variety of smoothness assumptions.
@@ -196,12 +193,14 @@ The first two of these issues are partially addressed by recent work of \cite{Ch
 In the present paper, we obtain finite-sample rates of convergence that are ``instance-optimal'' not just for the specific distribution $P$ but also for the specific query point. This is achieved by defining a {\it margin}, or {\it advantage}, at every point in the input space, and giving bounds (Theorem~\ref{thm:pointwise-rate}) entirely in terms of this quantity. For parametric classification, it has become common to define a notion of margin that controls generalization. In the nonparametric setting, it makes sense that the margin would in fact be a function $\X \rightarrow \R$, and would yield different generalization error bounds in different regions of space. Our adaptive nearest neighbor classifier allows us to realize this vision in a fairly elementary manner.
 
 \paragraph{Organization.} 
-{\new{We begin by formally defining the setup and notation in \Cref{sec:setup}.
+Due to space limitations, all proofs are delegated to appendices.
+
+We begin by formally defining the setup and notation in \Cref{sec:setup}.
 Then, a formal description of the adaptive $k$-NN algorithm is given in~\Cref{sec:alg}.
 In \Cref{sec:gen1,sec:gen2,sec:gen3} we state and prove consistency and generalization
 bounds for this classifier, and compare them with previous bounds in the $k$-NN literature.
 These bounds exploit a general VC-based uniform convergence statement
-which is presented and proved in a self-contained manner in \Cref{sec:ucecm}.}}
+which is presented and proved in a self-contained manner in \Cref{sec:ucecm}.
 
 
 \section{Setup}\label{sec:setup}
@@ -312,11 +311,11 @@ Pick any $p, \gamma > 0$. Recalling definition
 if the following holds for either $s=+1$ or $s=-1$:
 \begin{itemize}
 \item $s \eta(x) > 0$, and $s \eta(B(x,r)) > 0$ for all $r \in
-  [0,r_p(x))$, and $s \eta(B(x,r_p(x))) \geq s \gamma$.
+  [0,r_p(x))$, and $s \eta(B(x,r_p(x))) \geq \gamma$.
 \end{itemize}
-{\new{In words, this means that $g^*(x)=s$ (recall that $g^*$ is the Bayes classifier),
-that the biases of all balls of radius $\leq r$ around $x$ have the same sign like $s$, and that
-bias of the ball of radius $r$ has margin at least $\gamma$.}}
+In words, this means that $g^*(x)=s$ (recall that $g^*$ is the Bayes classifier),
+that the biases of all balls of radius $\leq r_p(x)$ around $x$ have the same sign as $s$, and that
+bias of the ball of radius $r_p(x)$ has margin at least $\gamma$.
 A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The {\it advantage} of $x$ is taken to be the largest value of $p\gamma^2$ over all such pairs:
 \begin{equation}
 \adv(x) = 
@@ -332,26 +331,11 @@ We will see (Lemma~\ref{lemma:positive-advantage}) that under a mild condition o
 
 \subsection{Advantage-based finite-sample bounds}
 
-%\begin{theorem}[Pointwise convergence rate]
-%There is an absolute constant $C > 0$ for which the following holds. Pick a point $x \in \supp(\mu)$ and a confidence parameter $0 < \delta < 1$. Suppose the $\algname$ algorithm (Figure~\ref{fig:alg}) is used to define a classifier $g_n$ based on $n$ training points chosen i.i.d.\ from $P$. If the size of the training set satisfies 
-%$$ n \geq \frac{C}{\adv(x)} \max \left( \log \frac{1}{\adv(x)}, \ \log \frac{1}{\delta} \right),$$
-%then with probability at least $1-\delta$, we will have $g_n(x) = g^*(x)$.
-%\label{thm:pointwise-rate}
-%\end{theorem}
-%\shay{The above formulation confuses me. Specifically, the quantifiers are somewhat vague:
-%It seems that $x$ and $\delta$ have the same quantification but, as far as I understand, they do not:
-%$x$ is quantified universally whereas $\delta$  is a parameter of the algorithm.
-%In other words, first we pick any $\delta\in [0,1]$, which specifies the algorithm,
-%and then we argue: for every $\mu$ and for every $x\in \supp(\mu)$, etcetera.
-%I suggest to use ``pick'' for $\delta$, and use ``let'' for $x$.
-%Here is an alternative formulation (feel free to modify/discard).}
-
-{\new{The following theorem shows that for every point $x$,
+The following theorem shows that for every point $x$,
 if the sample size $n$ satisfies $n\gtrapprox 1/\adv(x)$,
 then the label of $x$ is likely to be $g^*(x)$, where $g^*$ is the Bayes optimal classifier.
 This provides a pointwise convergence of $g(x)$ to $g^*(x)$ with a rate which
 is sensitive to the ``local geometry'' of~$x$.
-}}
 
 \begin{theorem}[Pointwise convergence rate]
 There is an absolute constant $C > 0$ for which the following holds.
@@ -363,11 +347,9 @@ then with probability at least $1-\delta$ we have that $g_n(x)=g^*(x)$.
 \label{thm:pointwise-rate}
 \end{theorem}
 
-
-
-{\new{If we further assume that the family of all balls in the space has a finite VC dimension $d_o$ then 
+If we further assume that the family of all balls in the space has finite VC dimension $d_o$ then 
 we can strengthen \Cref{thm:pointwise-rate} so that the guarantee holds with high probability \underline{simultaneously} for all $x\in \supp(\mu)$.
-This is achieved by a modified version of the algorithm that uses confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}).}}
+This is achieved by a modified version of the algorithm that uses confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}).
 
 %\begin{theorem} [Uniform convergence rate]
 %Suppose that the set of balls in $(\X,d)$ has finite VC dimension $d_0$, and that the algorithm of Figure~\ref{fig:alg} is used with confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}). Pick any $0 < \delta < 1$. With probability at least $1-\delta$, the resulting classifier $g_n$ will have $g_n(x) = g^*(x)$ for all $x \in \supp(\mu)$ for which 
@@ -441,8 +423,7 @@ This is known to hold, for instance, in any finite-dimensional normed space or a
 
 We will now see that this same condition implies the universal consistency of the adaptive nearest neighbor rule. To begin with, it implies that almost every point has a positive advantage.
 \begin{lemma}
-Suppose metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Then,
-{\new{for any conditional expectation $\eta$}}, the set of points
+Suppose metric measure space $(\X, d, \mu)$ satisfies condition (\ref{eq:lebesgue-condition}). Then, for any conditional expectation $\eta$, the set of points
 $$ \{x \in \X: \eta(x) \neq 0, \, \adv(x) = 0\}$$
 has zero $\mu$-measure.
 \label{lemma:positive-advantage}
@@ -453,17 +434,14 @@ Since $\mu(\supp(\mu))=1$, it follows that $\mu(\X') = 1$.
 
 Pick any $x \in \X'$ with $\eta(x) \neq 0$; without loss of generality, $\eta(x) > 0$. By (\ref{eq:lebesgue-condition}), there exists $r_o > 0$ such that
 $$\eta(B(x,r)) \geq \eta(x)/2 \mbox{\  for all \ } 0 \leq r \leq r_o.$$
-Thus $x$ is $(p,\gamma)$-salient for $p = \mu(B(x,r_o)) > 0$ and $\gamma = \eta(x)/2$, and hence has positive advantage.
+Thus $x$ is $(p,\gamma)$-salient for $p = \mu(B(x,r_o)) > 0$ and $\gamma = \eta(x)/2$, and has positive advantage.
 \end{proof}
 
 Universal consistency follows as a consequence; the proof details are deferred to Section~\ref{sec:proof-outline}.
 \begin{theorem}[Universal consistency]
-Suppose the metric measure space $(\X, d, \mu)$ satisfies condition~(\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\lim_{n \rightarrow \infty} \delta_n = 0$, (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$, and (3) $\lim_{N \rightarrow \infty} \sum_{n \geq N} \delta_n = 0$. Let the classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the $\algname$ procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
+Suppose the metric measure space $(\X, d, \mu)$ satisfies condition~(\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\sum_n \delta_n < \infty$ and (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$. Let the classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the $\algname$ procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
 \label{thm:universal-consistency}
 \end{theorem}
-\textcolor{red}{Shay: Item (3) is equivalent to $\sum_n \delta_n < \infty$.
-Thus, we can replace items (1), (2), and (3) with: 
-``Let $(\delta_n)$ be a sequence in $[0,1]$ such that (1) $\sum_n \delta_n < \infty$ and (2) $\delta_n = \omega(2^{-n})$'', which is somewhat easier to read.}
 
 
 
