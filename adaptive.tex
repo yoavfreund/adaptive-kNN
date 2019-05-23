@@ -193,11 +193,11 @@ The first two of these issues are partially addressed by recent work of \cite{Ch
 In the present paper, we obtain finite-sample rates of convergence that are ``instance-optimal'' not just for the specific distribution $P$ but also for the specific query point. This is achieved by defining a {\it margin}, or {\it advantage}, at every point in the input space, and giving bounds (Theorem~\ref{thm:pointwise-rate}) entirely in terms of this quantity. For parametric classification, it has become common to define a notion of margin that controls generalization. In the nonparametric setting, it makes sense that the margin would in fact be a function $\X \rightarrow \R$, and would yield different generalization error bounds in different regions of space. Our adaptive nearest neighbor classifier allows us to realize this vision in a fairly elementary manner.
 
 \paragraph{Organization.} 
-Due to space limitations, all proofs are delegated to appendices.
+Due to space limitations, all proofs are relegated to appendices.
 
 We begin by formally defining the setup and notation in \Cref{sec:setup}.
 Then, a formal description of the adaptive $k$-NN algorithm is given in~\Cref{sec:alg}.
-In \Cref{sec:gen1,sec:gen2,sec:gen3} we state and prove consistency and generalization
+In \Cref{sec:gen1,sec:gen2,sec:gen3}, we state and prove consistency and generalization
 bounds for this classifier, and compare them with previous bounds in the $k$-NN literature.
 These bounds exploit a general VC-based uniform convergence statement
 which is presented and proved in a self-contained manner in \Cref{sec:ucecm}.
@@ -315,8 +315,8 @@ if the following holds for either $s=+1$ or $s=-1$:
 \end{itemize}
 In words, this means that $g^*(x)=s$ (recall that $g^*$ is the Bayes classifier),
 that the biases of all balls of radius $\leq r_p(x)$ around $x$ have the same sign as $s$, and that
-bias of the ball of radius $r_p(x)$ has margin at least $\gamma$.
-A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The {\it advantage} of $x$ is taken to be the largest value of $p\gamma^2$ over all such pairs:
+the bias of the ball of radius $r_p(x)$ has margin at least $\gamma$.
+A point $x$ can satisfy this definition for a variety of pairs $(p,\gamma)$. The {\it advantage} of~$x$ is taken to be the largest value of $p\gamma^2$ over all such pairs:
 \begin{equation}
 \adv(x) = 
 \left\{
@@ -348,7 +348,7 @@ then with probability at least $1-\delta$ we have that $g_n(x)=g^*(x)$.
 \end{theorem}
 
 If we further assume that the family of all balls in the space has finite VC dimension $d_o$ then 
-we can strengthen \Cref{thm:pointwise-rate} so that the guarantee holds with high probability \underline{simultaneously} for all $x\in \supp(\mu)$.
+we can strengthen \Cref{thm:pointwise-rate} so that the guarantee holds with high probability \underline{simultaneously} for all~$x\in \supp(\mu)$.
 This is achieved by a modified version of the algorithm that uses confidence interval (\ref{eq:delta-modified}) instead of (\ref{eq:delta-default}).
 
 %\begin{theorem} [Uniform convergence rate]
@@ -451,68 +451,63 @@ Suppose the metric measure space $(\X, d, \mu)$ satisfies condition~(\ref{eq:leb
 \label{thm:universal-consistency}
 \end{theorem}
 
+\shay{I want to see if we can make the point that the constraints on $\delta_n$ are rather intuitive:
+regarding item (2): note that if $\delta_n << 2^{-n}$ is tiny then we essentially grow a ball around $x$
+until one of the labels has an overwhelming majority of, say $n$. This makes no sense\ldots}
+
 
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=0.9\linewidth, height=1.8in]{figs/combined_figure.png}
 \end{center}
 \caption{%Results from an experiment comparing the 
-  Effect of label noise on $k$-NN.
-  Performance on MNIST for different levels of random label noise $p$
-  and for different values of $k$. Each line in the figure on the left {\bf (a)}
-  represents the performance of $k$-NN as a function of $k$ for a
-  given level of noise. Observe that the optimal choice of $k$
-  increases with the noise level, and that the performance degrades
-  severely if a too-small value of $k$ is used. The table on the right {\bf (b)}
-  shows that $\algname$, with a fixed value of $A$, performs almost as well
-  as $k$-NN with the optimal choice of $k$.}
+  Effect of label noise on $k$-NN and $\algname$.
+  Performance on MNIST for different levels of random label noise $p$ and for different values of $k$. 
+  Each line in the figure on the left {\bf (a)} represents the performance of $k$-NN as a function of $k$ for a given level of noise. 
+  The optimal choice of $k$ increases with the noise level, and that the performance degrades severely for too-small $k$. 
+  The table {\bf (b)} shows that $\algname$, with a fixed value of $A$, performs almost as well as $k$-NN with the optimal choice of $k$.
+  }
 \label{fig:mnist}
 \end{figure}
 
 \begin{figure}[th]
-    \begin{minipage}{0.57\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
         \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_combinedGraphs.png}
-        \caption{\small Performance of $\algname$ on notMNIST for three different
-          settings of the confidence parameter $A=1,3,9$, as a
-          function of the neighborhood size.}
-      \end{minipage}
-      \hspace{0.2cm}
-      \begin{minipage}{0.4\textwidth}
-        \begin{small}
-          For each confidence level we show two graphs: an accuracy
-          graph (solid lines) and a coverage line (dashed line). for
-          each value of $k$ we plot the accuracy and the coverage of
-          AKNN which is restricted to using a neighborhood size of at
-          most $k$. For the most part, increasing $A$ causes an
-          increase in the accuracy and a decrease in coverage. Note
-          also that larger values of $A$ cause AKNN to have coverage
-          zero for values of $k$ that are too small. For comparison we
-          plot the performance of $k$-NN as a function of $k$. The
-          highest precision is 88.4\% which is achieved for
-          $k=10$. Interestingly, for this dataset both $A=1$ and $A=3$
-          achieve 100\% coverage and a precision of 89.3\%          
-          \end{small}
-      \end{minipage}  
-  \label{fig:aknnvsknn}
+    \end{subfigure}
+    \hspace{0.2cm}
+    \begin{minipage}{0.45\textwidth}
+    At left: performance of $\algname$ on notMNIST for different settings of the confidence parameter ($A=1,3,9$), as a function of the neighborhood size.
+    For each confidence level we show two graphs: an accuracy graph (solid lines) and a coverage line (dashed line). 
+    For each value of $k$ we plot the accuracy and the coverage of $\algname$ which is restricted to using a neighborhood size of at most $k$. 
+    Increasing $A$ generally causes an increase in the accuracy and a decrease in coverage. 
+    Larger values of $A$ cause $\algname$ to have coverage zero for values of $k$ that are too small. 
+    For comparison, we plot the performance of $k$-NN as a function of $k$. 
+    The highest accuracy ($\approx$ 0.88) is achieved for $k=10$ (dotted horizontal line), and is surpassed by $\algname$ with high coverage (100\% for $A=1$). %Interestingly, for this dataset both $A=1$ and $A=3$ achieve 100\% coverage and a precision of 89.3\%
+    \end{minipage} 
+    \caption{Performance of $\algname$ on notMNIST. See also Fig. \ref{fig:aknnvsknn}.}
+    \label{fig:aknnvsknn}
 \end{figure}
+
+
+
+
 
 \section{Experiments}
 
 \newcommand{\labels}{\mathcal{Y}}
 
 We performed a few experiments using real-world datasets from computer vision and genomics (see Section \ref{sec:experimentappendix}). 
-These were conducted with some practical alterations to the algorithm described in Figure~\ref{fig:alg}. 
+These were conducted with some practical alterations to the algorithm of Fig.~\ref{fig:alg}. 
 
 %\begin{itemize}
 %\item
 %{\bf First,} we extend the algorithm to multi-class. 
-{\bf Multiclass extension:} Suppose the set of possible labels is  $\labels$. We
-replace the binary rule ``find the smallest $k$ such that $\left|\eta_n(B_k(x))\right| >
-\Delta(n, k,\delta)$ with the rule: ``find the smallest $k$ such that $\eta^y_n(B_k(x)) - \frac{1}{|\labels|}>
-\Delta(n, k,\delta)$ for some $y \in \labels$,  where $\eta^y_n(S) \doteq \frac{\#_n\{x_i \in S
-    \mbox{ and } y_i = y\}}{\#_n(S)}$.
-    \newline
+{\bf Multiclass extension:} Suppose the set of possible labels is  $\labels$. 
+We replace the binary rule ``find the smallest $k$ such that $\left|\eta_n(B_k(x))\right| > \Delta(n, k,\delta)$" with the rule: ``find the smallest $k$ such that $\eta^y_n(B_k(x)) - \frac{1}{|\labels|} > \Delta(n, k,\delta)$ 
+for some $y \in \labels$,  where 
+$\eta^y_n(S) \doteq \frac{\#_n\{x_i \in S \mbox{ and } y_i = y\}}{\#_n(S)}$."
+\newline
 %{\bf Second,} w
 {\bf Parametrization:} 
 We replace Equation~(\ref{eq:delta-default}) with $\Delta = \frac{A}{\sqrt{k}}$, where $A$ is a {\em confidence} parameter. \newline
@@ -525,7 +520,7 @@ In some situations, using subsets of the labels is more informative.
 However, when we want to compare head-to-head with $k$-NN, we need to output a single label. 
 We use a heuristic to predict with a single label $y \in \labels$ on any $x$: the label for which $\max_k \eta^y_n(B_k(x))/\sqrt{k}$ is largest.
 
-\pagebreak
+%\pagebreak
 
 
 
@@ -552,48 +547,42 @@ We use a heuristic to predict with a single label $y \in \labels$ on any $x$: th
 
 \begin{figure}[th]
     \centering
-    \begin{subfigure}{0.95\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/umapnotMNIST_combined.png}
+        \includegraphics[width=\linewidth]{figs/notMNIST/umapnotMNIST_labels_foreground_and_back.pdf}
+        %\caption{Price regulation} \label{fig:timing3}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/notMNIST/umapnotMNIST_adak_Aeq4.pdf}
         %\caption{Price regulation} \label{fig:timing3}
     \end{subfigure}
     %\hfill
-    \caption{ A visualization of the performance of AKNN on notMNIST.
-      {\bf (a)} The correct labels. {\bf (b)} The value of $k$ chosen
-      by the algorithm when predicting each datapoint. Zooming in
-      would reveal more details. An interactive visualization is
-      available at \texttt{http://35.239.251.24/aknn/}}
+    \caption{ A visualization of the performance of $\algname$ on notMNIST.
+      {\bf (a)} The correct labels, with prediction errors of $\algname \;(A = 4)$ highlighted. 
+      {\bf (b)} The value of $k$ chosen by the algorithm when predicting each datapoint. Zooming in reveals more details. An interactive explorer for our experiments is available at \texttt{http://35.239.251.24/aknn/}.}
   \label{fig:varyingadak}
 \end{figure}
 
 
-We briefly discuss our main conclusions from the experiments.
+We briefly discuss our main conclusions from the experiments, with further details deferred to \Cref{sec:experimentappendix}.
 
 {\bf $\algname$ is comparable to the best $k$-NN rule.}
-In Section~\ref{sec:knn-comparison} we prove that $\algname$ compares
-favorably to $k$-NN with any fixed $k$. We see this in practice when
-we add independent label noise to the MNist dataset. A small value of
-$k$ is optimal for noiseless data, but performs very poorly when the
-noise level is high. On the other hand AKNN adapts to the noise level
-automatically.(Fig.~\ref{fig:mnist}).\\
+In Section~\ref{sec:knn-comparison} we prove that $\algname$ compares favorably to $k$-NN with any fixed $k$. 
+We demonstrate this in practice in different situations. With simulated independent label noise on the MNIST dataset (Fig.~\ref{fig:mnist}), a small value of $k$ is optimal for noiseless data, but performs very poorly when the noise level is high. 
+On the other hand, $\algname$ adapts to the local noise level automatically, as demonstrated without adding noise on the more challenging notMNIST and single-cell genomics data (Fig. \ref{fig:aknnvsknn}, \ref{fig:varyingadak}, \ref{fig:aknnvsknn_muris}). 
+
 {\bf Varying the confidence parameter $A$ controls abstaining.}
-The parameter $A$ controls how conservative the algorithm is deciding
-to abstain, instead of incurring error by predicting. $A \to 0$
-represents the most aggressive setting, in which the algorithm never
-abstains, essentially predicting according to a $1$-NN rule. Higher
-settings of $A$ cause the algorithm to abstain on some of these
-predicted points, for which there is no sufficiently small
-neighborhood with a sufficiently significant label bias. This is
-illustrated in Figure \ref{fig:varyingparam}.\\
+The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. 
+$A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. 
+Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias (Fig. \ref{fig:varyingparam}).
+
 {\bf Adaptively chosen neighborhood sizes reflect local confidence.}
-The number of neighbors chosen by $\algname$ is a local quantity that
-gives a pointwise measure of the confidence associated with label
-predictions. Small neighborhoods are chosen when one label is measured
-as significant nearly as soon as statistically possible; by definition
-of the $\algname$ stopping rule, this is not true where large
-neighborhoods are necessary. Furthermore, higher settings of $A$
-increase the size of the neighborhood required to predict at all
-(Fig. \ref{fig:varyingadak}).
+The number of neighbors chosen by $\algname$ is a local quantity that gives a practical pointwise measure of the confidence associated with label predictions. 
+Small neighborhoods are chosen when one label is measured as significant nearly as soon as statistically possible; by definition of the $\algname$ stopping rule, this is not true where large neighborhoods are necessary. 
+In our experiments, performance on points with significantly higher neighborhood sizes dropped monotonically, with the majority of the dataset having performance significantly exceeding the best $k$-NN rule over a range of settings of $A$ (Fig. \ref{fig:aknnvsknn}, \ref{fig:aknnvsknn_muris}; \Cref{sec:experimentappendix}).
+
+
 
 
 % \begin{figure}
@@ -680,7 +669,7 @@ where $\#_n(C) = |\{i: x_i \in B\}|$ is the number of points in $C$ and
 \label{lemma:bias}
 \end{lemma}
 
-\Cref{lemma:bias} is a special case\footnote{\new{Indeed, \Cref{lemma:bias} follows from \Cref{thm:UCECM} 
+\Cref{lemma:bias} is a special case\footnote{{Indeed, \Cref{lemma:bias} follows from \Cref{thm:UCECM} 
 by plugging in it $\cA = \{\X\times\{+1\}\}, \B = \{C\times\{\pm 1\} : C\in\mathcal{C}\}$.}} of a uniform convergence bound for conditional probabilities (\Cref{thm:UCECM}) 
 that we present and prove in \Cref{sec:ucecm}.
 
@@ -1530,11 +1519,39 @@ We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extr
 
 We also test on the MNIST dataset. \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
 
-We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving gene expression data on a population single cells from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}, as processed in \cite{MouseAtlasData}). The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. Though both approaches measure effectively the same cells for our purposes, each approach has its own set of technical biases, about which much is unknown. Discriminating between the two approaches to identify these biases is currently of great interest.
+We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving gene expression data on a population single cells from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}, as processed in \cite{MouseAtlasData}). This constitutes 45291 cells (training examples). Each cell has its data collected using one of two approaches. The task is to classify between them. 
+
+The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. 
+Each approach has its own set of technical biases, about which much remains to be understood. Identifying and characterizing these biases to discriminate between such approaches is currently of great interest. 
+
+Both approaches measure effectively the same cells for our purposes, so there is a large decision boundary in the binary classification problem. 
 
 
-\newpage
+\subsection{A note on efficient implementation}
+
+In this paper, we computed the nearest neighbors of data exactly when running $\algname$, to faithfully demonstrate its behavior. 
+In practice, this would be done using approximate nearest-neighbor search to build a $k$-NN graph using a small fixed $k$ (say 10), and then using pairwise distances on this graph to compute neighborhoods as needed by $\algname$. 
+We tried this (using the nearest-neighbor method of \cite{DCL11}) on notMNIST without substantive differences in the results, and will release this implementation upon publication.
+
+
+%\pagebreak
 \subsection{Supplemental Figures}
+
+
+\begin{figure}[th]
+    \begin{subfigure}{0.48\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_aknnvsknn_acc.png}
+    \end{subfigure}
+    \begin{subfigure}{0.48\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_aknnvsknn_abst.png}
+    \end{subfigure}
+    \caption{As Fig. \ref{fig:aknnvsknn}, on single-cell mouse data.}
+    \label{fig:aknnvsknn_muris}
+\end{figure}
+
+
 
 \begin{figure}
     \begin{subfigure}[t]{0.30\textwidth}
@@ -1552,7 +1569,7 @@ We use $\algname$ on a challenging binary classification task of independent and
         \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
     \end{subfigure}
     \hfill
-  \caption{$\algname$ predictions on notMNIST.}
+  \caption{$\algname$ predictions on notMNIST, for different settings of $A$.}
   \label{fig:varyingparam}
 \end{figure}
 
@@ -1589,65 +1606,44 @@ We use $\algname$ on a challenging binary classification task of independent and
     \end{subfigure}
     \hfill
   \caption{$\algname$ neighborhood sizes on notMNIST, in increasing order of $A$, plotted on a log scale. Top left figure ($A = 0$) represents a $1$-NN classifier. Bottom right figure ($A = 15$) shows that many of the points' neighborhoods are maximally large, which can be compared to the right panel of Fig. \ref{fig:varyingparam}.}
-  \label{fig:varyingadak}
+  \label{fig:varyingadak_supp}
 \end{figure}
 
-
-
-\begin{figure}
-    \begin{subfigure}[t]{0.30\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq4.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.30\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq9.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.34\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_preds_Aeq15.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-    \hfill
-  \caption{As Fig. \ref{fig:varyingparam}, on single-cell mouse data.}
-  \label{fig:varyingparam_muris}
-\end{figure}
-
+    
 
 \begin{figure}
     \begin{subfigure}[t]{0.32\textwidth}
     \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq0.png} 
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq05.png} 
         %\caption{Price regulation} \label{fig:timing3}
     \end{subfigure}
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq1.png} 
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq1.png} 
         %\caption{Competitors} \label{fig:timing2}
     \end{subfigure}
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq4.png} %\caption{Generic} \label{fig:timing1}
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
     \end{subfigure}
     \hfill
     
     \begin{subfigure}[t]{0.32\textwidth}
     \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq6.png} 
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq2.png} 
         %\caption{Price regulation} \label{fig:timing3}
     \end{subfigure}
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq8.png} 
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq25.png} 
         %\caption{Competitors} \label{fig:timing2}
     \end{subfigure}
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/notMNIST/notMNIST_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq3.png} %\caption{Generic} \label{fig:timing1}
     \end{subfigure}
     \hfill
-  \caption{As Fig. \ref{fig:varyingadak}, on single-cell mouse data.}
+  \caption{As Fig. \ref{fig:varyingadak_supp}, on single-cell mouse data.}
   \label{fig:varyingadak_muris}
 \end{figure}
 
