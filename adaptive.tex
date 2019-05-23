@@ -147,7 +147,7 @@ and its error rate is the Bayes risk, $R^* = \frac{1}{2}\E_{X \sim \mu} \left[1-
 In this paper, we are interested in consistency as well as rates of
 convergence. In particular, we find that the adaptive nearest neighbor
 rule is also asymptotically consistent (under the same technical
-conditions) while converging at a rate that is at least as good as,
+conditions) while converging at a rate that is about as good as,
 and sometimes significantly better than, that of $k$-NN
 under any schedule $(k_n)$.
 
@@ -410,9 +410,10 @@ In contrast, the work of \cite{ChaudhuriDasgupta2014} showed that with $n$ train
 \end{align*}
 Such points are $(k/n, k^{-1/2})$-salient and thus have advantage at least $1/n$. In fact,
 $$ \bigcup_{1 \leq k \leq n} \X'_{n,k} \subseteq \X_{1/n} .$$
-In this formal sense, the adaptive nearest neighbor procedure is able to perform as well as all choices of $k$ simultaneously.
+In this sense, the adaptive nearest neighbor procedure is able to perform roughly as well as all choices of $k$ simultaneously (logarithmic factors prevent this from being a precise statement).
+
 \yoav{In fact, in my experiments, AKNN performs {\em almost} as well
-  as the best choice of $k$. Can we acount for this difference? We
+  as the best choice of $k$. Can we account for this difference? We
   need to make a statement that does not contradict the expriments...}
 
 
