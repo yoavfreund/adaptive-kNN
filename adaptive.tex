@@ -5,11 +5,11 @@
 % before loading neurips_2019
 
 % ready for submission
-\usepackage{neurips_2019}
+% \usepackage{neurips_2019}
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
 % [preprint] option:
-%     \usepackage[preprint]{neurips_2019}
+\usepackage[preprint, nonatbib]{neurips_2019}
 
 % to compile a camera-ready version, add the [final] option, e.g.:
 % \usepackage[final]{neurips_2019}
@@ -193,14 +193,16 @@ The first two of these issues are partially addressed by recent work of \cite{Ch
 In the present paper, we obtain finite-sample rates of convergence that are ``instance-optimal'' not just for the specific distribution $P$ but also for the specific query point. This is achieved by defining a {\it margin}, or {\it advantage}, at every point in the input space, and giving bounds (Theorem~\ref{thm:pointwise-rate}) entirely in terms of this quantity. For parametric classification, it has become common to define a notion of margin that controls generalization. In the nonparametric setting, it makes sense that the margin would in fact be a function $\X \rightarrow \R$, and would yield different generalization error bounds in different regions of space. Our adaptive nearest neighbor classifier allows us to realize this vision in a fairly elementary manner.
 
 \paragraph{Organization.} 
-Due to space limitations, all proofs are relegated to appendices.
+Most proofs are relegated to the appendices.
 
 We begin by formally defining the setup and notation in \Cref{sec:setup}.
 Then, a formal description of the adaptive $k$-NN algorithm is given in~\Cref{sec:alg}.
 In \Cref{sec:gen1,sec:gen2,sec:gen3}, we state and prove consistency and generalization
 bounds for this classifier, and compare them with previous bounds in the $k$-NN literature.
 These bounds exploit a general VC-based uniform convergence statement
-which is presented and proved in a self-contained manner in \Cref{sec:ucecm}.
+which is presented and proved in a self-contained manner in \Cref{sec:ucecm}. 
+
+
 
 \section{Setup}\label{sec:setup}
 
@@ -269,13 +271,10 @@ Given:
 \vspace{.1in}
 To predict at $x \in \X$:
 \begin{itemize}
-\item For any integer $k$, let $B_k(x)$ denote the smallest ball
-  centered at $x$ that contains exactly $k$ training
-  points.~\footnote{When several points have the same distance to $x$
-    there might be some values of $k$ for which $B_k(x)$ is
-    undefined. Our algorithm skips such values of $k$.}
-\item Find the smallest $0 < k \leq n$ for which the $B_k(x)$ has a
-  {\em significant bias}: that is,~$\left|\eta_n(B_k(x))\right| > \Delta(n, k,\delta)$, where
+\item For any integer $k$, let $B_k(x)$ denote the smallest ball centered at $x$ that contains exactly $k$ training points.
+~\footnote{When several points have the same distance to $x$, there might be some values of $k$ for which $B_k(x)$ is undefined. Our algorithm skips such values of $k$.}
+\item Find the smallest $0 < k \leq n$ for which the $B_k(x)$ has a {\em significant bias}: 
+that is,~$\left|\eta_n(B_k(x))\right| > \Delta(n, k,\delta)$, where
 \begin{equation}
 \Delta(n,k,\delta) = c_1 \sqrt{\frac{\log n + \log (1/\delta)}{k}}.
 \label{eq:delta-default}
@@ -295,7 +294,7 @@ The adaptive $k$-NN algorithm ($\algname$) is shown in Figure~\ref{fig:alg}. It 
 
 Later, we will also discuss a variant of this algorithm in which a modified confidence interval,
 \begin{equation}
-\Delta(n,k,\delta) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{k}},
+\Delta(n,k,\delta) = c_1 \sqrt{\frac{d_0 \log n + \log (1/\delta)}{k}}
 \label{eq:delta-modified}
 \end{equation}
 is used, where $d_0$ is the VC dimension of the family of balls in $(\X,d)$. 
@@ -444,7 +443,7 @@ $$\eta(B(x,r)) \geq \eta(x)/2 \mbox{\  for all \ } 0 \leq r \leq r_o.$$
 Thus $x$ is $(p,\gamma)$-salient for $p = \mu(B(x,r_o)) > 0$ and $\gamma = \eta(x)/2$, and has positive advantage.
 \end{proof}
 
-Universal consistency follows as a consequence; the proof details are deferred to Section~\ref{sec:proof-outline}.
+Universal consistency follows as a consequence; the proof details are deferred to \Cref{sec:proof-outline}.
 \begin{theorem}[Universal consistency]
 Suppose the metric measure space $(\X, d, \mu)$ satisfies condition~(\ref{eq:lebesgue-condition}). Let $(\delta_n)$ be a sequence in $[0,1]$ with (1) $\sum_n \delta_n < \infty$ and (2) $\lim_{n \rightarrow \infty} (\log (1/\delta_n))/n = 0$. Let the classifier $g_{n, \delta_n}: \X \rightarrow \{-1,+1,?\}$ be the result of applying the $\algname$ procedure (Figure~\ref{fig:alg}) with $n$ points chosen i.i.d.\ from $P$ and with confidence parameter $\delta_n$. Letting $R_n = R(g_{n,\delta_n})$ denote the risk of $g_{n,\delta_n}$, we have $R_n \rightarrow R^*$ almost surely.
 \label{thm:universal-consistency}
@@ -477,7 +476,7 @@ until one of the labels has an overwhelming majority of, say $n$. This makes no 
     \hspace{0.2cm}
     \begin{minipage}{0.45\textwidth}
     At left: performance of $\algname$ on notMNIST for different settings of the confidence parameter ($A=1,3,9$), as a function of the neighborhood size.
-    For each confidence level we show two graphs: an accuracy graph (solid lines) and a coverage line (dashed line). 
+    For each confidence level we show two graphs: an accuracy graph (solid line) and a coverage line (dashed line). 
     For each value of $k$ we plot the accuracy and the coverage of $\algname$ which is restricted to using a neighborhood size of at most $k$. 
     Increasing $A$ generally causes an increase in the accuracy and a decrease in coverage. 
     Larger values of $A$ cause $\algname$ to have coverage zero for values of $k$ that are too small. 
@@ -493,6 +492,7 @@ until one of the labels has an overwhelming majority of, say $n$. This makes no 
 
 
 \section{Experiments}
+\label{sec:experiments}
 
 \newcommand{\labels}{\mathcal{Y}}
 
@@ -509,7 +509,7 @@ $\eta^y_n(S) \doteq \frac{\#_n\{x_i \in S \mbox{ and } y_i = y\}}{\#_n(S)}$."
 \newline
 %{\bf Second,} w
 {\bf Parametrization:} 
-We replace Equation~(\ref{eq:delta-default}) with $\Delta = \frac{A}{\sqrt{k}}$, where $A$ is a {\em confidence} parameter. \newline
+We replace Equation~(\ref{eq:delta-default}) with $\Delta = \frac{A}{\sqrt{k}}$, where $A$ is a confidence parameter corresponding to the theory's $\delta$ (given $n$). \newline
 %{\bf Third,} 
 {\bf Resolving multilabel predictions:} 
 Our algorithm can output answers that are not a single label. 
@@ -572,7 +572,7 @@ We demonstrate this in practice in different situations. With simulated independ
 On the other hand, $\algname$ adapts to the local noise level automatically, as demonstrated without adding noise on the more challenging notMNIST and single-cell genomics data (Fig. \ref{fig:aknnvsknn}, \ref{fig:varyingadak}, \ref{fig:aknnvsknn_muris}). 
 
 {\bf Varying the confidence parameter $A$ controls abstaining.}
-The parameter $A$ controls how conservative the algorithm is deciding to abstain, instead of incurring error by predicting. 
+The parameter $A$ controls how conservative the algorithm is in deciding to abstain, instead of incurring error by predicting. 
 $A \to 0$ represents the most aggressive setting, in which the algorithm never abstains, essentially predicting according to a $1$-NN rule. 
 Higher settings of $A$ cause the algorithm to abstain on some of these predicted points, for which there is no sufficiently small neighborhood with a sufficiently significant label bias (Fig. \ref{fig:varyingparam}).
 
@@ -644,15 +644,15 @@ The first step in establishing advantage-dependent rates of convergence is to bo
 
 Suppose we draw $n$ points $(x_1, y_1), \ldots, (x_n, y_n)$ from $P$. If $n$ is reasonably large, we would expect the empirical mass $\mu_n(S)$ of any set $S \subset \X$, as defined in (\ref{eq:empirical-mass}), to be close to its probability mass under $\mu$. The following lemma, from \cite{ChaudhuriDasgupta2010}, quantifies one particular aspect of this.
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 7]
-There is a universal constant $c_o$ such that the following holds. Let~$\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
-$$ \mu(B) \geq \frac{k}{n} + \frac{c_o}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
+There is a universal constant $c_0$ such that the following holds. Let~$\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x_1, y_1), \ldots, (x_n, y_n)$, for all $B \in \B$ and for any integer $k$, we have
+$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \max \left( k, d_0 \log \frac{n}{\delta} \right)
 \ \ \implies \ \ 
 \mu_{n}(B) \geq \frac{k}{n} .$$
 \label{lemma:points-in-balls}
 \end{lemma}
 
 \shay{Why do we use $1-\delta^2/2$ and not $1-\delta$? 
-both choices are equivalent (by changing the constant $c_o$)
+both choices are equivalent (by changing the constant $c_0$)
 and $1-\delta$ reads better\ldots }
 
 
@@ -693,11 +693,11 @@ then with probability at least $1-\delta$ we have that $g_n(x)=g^*(x)$.
 %\label{lemma:pointwise}
 %\end{lemma}
 \begin{proof}
-Define $c_2 = \max(c_1, 1/2) \sqrt{1+c_o}$, where $c_o$ and $c_1$ are the constants from Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, and take $c_3 = 16 c_2^2$.
+Define $c_2 = \max(c_1, 1/2) \sqrt{1+c_0}$, where $c_0$ and $c_1$ are the constants from Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, and take $c_3 = 16 c_2^2$.
 
 Suppose $\eta(x) > 0$; the negative case is symmetric. The set $\B$ of all balls centered at $x$ is easily seen to have VC dimension $d_0 = 1$. By Lemmas~\ref{lemma:points-in-balls} and \ref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
 \begin{enumerate}
-\item For any integer $k$, we have $\#_n(B) \geq k$ whenever $n \mu(B) \geq k + c_o \max(k, \log (n/\delta))$.
+\item For any integer $k$, we have $\#_n(B) \geq k$ whenever $n \mu(B) \geq k + c_0 \max(k, \log (n/\delta))$.
 \item $|\eta_n(B) - \eta(B)| \leq \Delta(n, \#_n(B), \delta)$.
 \end{enumerate}
 Assume henceforth that these hold.
@@ -709,7 +709,7 @@ By the definition of advantage, point $x$ is $(p,\gamma)$-salient for some $p,\g
 \end{equation}
 or equivalently that $n \cdot \adv(x) \geq 4c_2^2 (\log n + \log (1/\delta))$.
 
-Set $k = np/(1 + w)$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + w \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
+Set $k = np/( 1 + c_0 )$. By (\ref{eq:gamma}) we have $np \geq 4 c_2^2 \log (n/\delta)$ and thus $k \geq \log (n/\delta)$. As a result, $np \geq k + c_0 \max(k, \log (n/\delta))$, and by property 1, the ball $B = B(x, r_p(x))$ has $\#_n(B) \geq k$. This means, in turn, that by property 2,
 \begin{align*}
 \eta_n(B) &\geq \ \eta(B) - \Delta(n, k, \delta)
 = \gamma - c_1 \sqrt{\frac{\log (n/\delta)}{k}} \\
@@ -837,7 +837,7 @@ We prove the following (slightly weaker) variant:
 Let $P$ be a probability distribution over $X$, and let $\cA,\cB$
 be two families of measurable subsets of $X$ such that $\mathsf{VC}(\cA),\mathsf{VC}(\cB)\leq d_0$.
 Let $n\in\mathbb{N}$, and let $x_1\ldots x_n$ be $n$ i.i.d samples from $P$.
-The, the following event occurs with probability at least $1-\delta$:
+Then the following event occurs with probability at least $1-\delta$:
 \[\left(\forall A\in\cA\right)\left(\forall B\in\B\right):\left\lvert P(A \vert B) - P_n(A \vert B) \right\rvert \leq 
 \sqrt{\frac{k_o}{\#_n(B)}},\]
 where $k_o = 1000 \left(d_0 \log(8n) + \log(4/\delta)\right)$, and\footnote{Note that the above inequality makes sense also when $k(B)=0$,
@@ -883,7 +883,7 @@ This resembles the learning rate in realizable settings.
 
 We remark that a weaker statement than \Cref{thm:UCECM}
 can be derived as a corollary of the classical uniform convergence
-result~\citep{vapnik1971uniform}. 
+result~\cite{vapnik1971uniform}. 
 Indeed, since the VC dimension of $\{B\cap A : i\in \I\}$ is at most $d_0$, it follows that 
 \[P_n(A\vert B)\approx\frac{P(A\cap B) \pm \sqrt{d_0 / n}}{P(B)\pm \sqrt{d_0 / n}}.\]
 However, this bound guarantees non-trivial estimates only once $P(B)$ is roughly $\sqrt{d_0  / n}$.
@@ -1436,7 +1436,7 @@ x \in \supp(\mu) : s \eta(x) > 0 , \exists p_x > 0 \text{ s.t. }
 &s \eta(B(x,r)) \geq 0 \quad\forall r \in (0, r_{p_x}(x)]
 \Bigg\}
 \end{align*}
-where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_o}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
+where $c_2 = \max(2c_1, \frac{\varphi}{2} ) \sqrt{1 + c_0}$ for $\varphi := \frac{1}{2} (1 + \sqrt{5})$.
 Also define 
 $$ \partial_n (\delta) = \X \setminus (\X^+_{n,\delta} (\delta) \cup \X^-_{n,\delta}) $$
 Then our main convergence rate result in this scenario shows that the measure of the effective boundary bounds the convergence of $\algname$.
@@ -1476,8 +1476,8 @@ with hidden constant depending on the assumptions we make.
 To prove \Cref{thm:fastrate2}, a relevant application of VC theory from \cite{ChaudhuriDasgupta2010} is useful:
 \begin{lemma}[\cite{ChaudhuriDasgupta2010}, Lemma 16]
 \label{lemma:points-in-balls-2}
-There is an absolute constant $c_o$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
-$$ \mu(B) \geq \frac{k}{n} + \frac{c_o}{n} \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)
+There is an absolute constant $c_0$ such that the following holds. Let $\B$ be any class of measurable subsets of $\X$ of VC dimension $d_0$. Pick any $0 < \delta < 1$. Then with probability at least $1-\delta^2/2$ over the choice of $(x^{(1)}, y^{(1)}), \ldots, (x^{(n)}, y^{(n)})$, for all $B \in \B$ and for any integer $k$, we have
+$$ \mu(B) \geq \frac{k}{n} + \frac{c_0}{n} \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)
 \ \ \implies \ \ 
 \mu_n(B) \geq \frac{k}{n} $$
 \end{lemma}
@@ -1486,12 +1486,12 @@ $$ \mu(B) \geq \frac{k}{n} + \frac{c_o}{n} \left( \kappa_{n, \delta} + \sqrt{k \
 Recall that we take the set $\B$ of all closed balls in $\X$ to have VC dimension at most $d_0$. 
 By \Cref{lemma:points-in-balls-2} and \Cref{lemma:bias}, we have that with probability at least $1-\delta^2$, the following two properties hold for all $B \in \B$:
 \begin{enumerate}
-\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_o \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
+\item For any integer $k$, we have $\mu_n(B) \geq k/n$ whenever $n \mu(B) \geq k + c_0 \left( \kappa_{n, \delta} + \sqrt{k \kappa_{n, \delta}} \right)$
 \item $|\bias_n(B) - \bias(B)| \leq \Delta(n, n \mu_n(B)) = c_1 \sqrt{\frac{\kappa_{n, \delta}}{n \mu_n(B)}}$
 \end{enumerate}
 Assume henceforth that these hold. Then it suffices to show that within this ``good" event, the adaptive-$k$ rule predicts correctly on $x \in \X^+_{n,\delta} \cup \X^-_{n,\delta}$ w.p. 1 under $\mu$. 
 
-This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta}$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta}$, and set $k(x) = np(x) / (1 + c_o)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_o) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_o} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
+This argument is analogous to that of \Cref{lemma:good-sets}, with $\log (n/\delta)$ replaced by $\kappa_{n, \delta}$. We state the argument for $x \in \X^+_{n,\delta}$. Define $p(x) = p_x$ to be a function of $x$ as specified in the definition of $\X^+_{n,\delta}$, and set $k(x) = np(x) / (1 + c_0)$. We first observe that by definition of $p(x)$ and $c_2$, we have $c_2 \sqrt{\kappa_{n, \delta}/(n p(x))} \leq 1/2$, and thus $np(x) \geq 4 c_2^2 \kappa_{n, \delta} \geq \varphi^2 (1+c_0) \kappa_{n, \delta}$, so that $k(x) \geq \varphi^2 \kappa_{n, \delta}$. Therefore, $\frac{1}{c_0} (np(x) - k(x)) = k(x) = \left( \frac{1}{\varphi^2} + \frac{1}{\varphi} \right) k(x) \geq \kappa_{n, \delta} + \sqrt{ \kappa_{n, \delta} k(x) }$. Thus, by property 1, the ball $B = B(x, r_{p(x)} (x))$ has $\mu_n(B) \geq k(x)/n$. This means, in turn, that by property 2, 
 \begin{align*}
 \bias_n(B) &\geq \bias(B) - \Delta(n, k(x) ) 
 \geq c_2 \sqrt{\frac{\kappa_{n, \delta}}{np}} - c_1 \sqrt{\frac{\kappa_{n, \delta}}{k(x)}} 
@@ -1514,16 +1514,17 @@ The argument for $x \in \X^-_{n,\delta}$ proceeds exactly symmetrically.
 
 \subsection{Datasets}
 
-We test $\algname$ on the notMNIST dataset (\cite{notMNIST}), consisting of extracted glyphs of the letters A-J from publicly available fonts. We use the 18724 labeled examples from this set, preprocessed feature-wise to be in $[-\frac{1}{2}, \frac{1}{2}]$ using $x \mapsto \frac{x}{255} - \frac{1}{2}$.
+We test $\algname$ on several datasets. The first was the MNIST dataset of 70000 examples (\cite{MNIST}). \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
 
-We also test on the MNIST dataset (\cite{MNIST}). \yoav{I tried centering the bounding box, but it made the results worse, so I abandoned it. I am using unaltered Euclidean distance on the public MNIST data.}
+We also evaluate $\algname$ on the more challenging notMNIST dataset (\cite{notMNIST}), consisting of extracted glyphs of the letters A-J from publicly available fonts. We use the 18724 labeled examples from this set, preprocessed feature-wise to be in $[-\frac{1}{2}, \frac{1}{2}]$ using $x \mapsto \frac{x}{255} - \frac{1}{2}$.
 
-We use $\algname$ on a challenging binary classification task of independent and continuing interest, involving gene expression data on a population single cells from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}, as processed in \cite{MouseAtlasData}). This constitutes 45291 cells (training examples). Each cell has its data collected using one of two approaches. The task is to classify between them. 
+We further use $\algname$ on a challenging binary classification task of continuing interest, involving gene expression data on a population of single cells from different mouse organs collected by the Tabula Muris consortium (\cite{tabulamuris18}, as processed in \cite{MouseAtlasData}). This constitutes 45291 cells (training examples). Each cell has its data collected using one of two approaches. The task is to classify between them. More details follow.
 
-The data are collected using representative protocols of the two currently dominant approaches to isolate and measure single cells: a ``plate"-based approach using microwells on a chip, and a ``droplet"-based approach manipulating cells within droplets using microfluidic technologies. 
+The data are collected using representative protocols of two currently dominant approaches to isolate and measure single cells: a plate-based approach sorting cells into microwells, and a droplet-based approach manipulating cells using microfluidic technologies. 
 Each approach has its own set of technical biases, about which much remains to be understood. Identifying and characterizing these biases to discriminate between such approaches is currently of great interest. 
 
 Both approaches measure effectively the same cells for our purposes, so there is a large decision boundary in the binary classification problem. 
+
 
 
 \subsection{A note on efficient implementation}
@@ -1546,9 +1547,10 @@ We tried this (using the nearest-neighbor method of \cite{DCL11}) on notMNIST wi
     \centering
         \includegraphics[width=\linewidth]{figs/single_cell/tabula_aknnvsknn_abst.png}
     \end{subfigure}
-    \caption{As Fig. \ref{fig:aknnvsknn}, on single-cell mouse data.}
+    \caption{As Fig. \ref{fig:aknnvsknn}, on single-cell mouse data. $\algname$ is notably accurate on small-neighborhood points at moderate coverage, and performance drops off at higher $k$, with $A$ controlling this frontier. }
     \label{fig:aknnvsknn_muris}
 \end{figure}
+
 
 
 
@@ -1610,41 +1612,79 @@ We tried this (using the nearest-neighbor method of \cite{DCL11}) on notMNIST wi
 
     
 
-\begin{figure}
-    \begin{subfigure}[t]{0.32\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq05.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq1.png} 
-        %\caption{Competitors} \label{fig:timing2}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
-    \end{subfigure}
-    \hfill
+% \begin{figure}
+%     \begin{subfigure}[t]{0.32\textwidth}
+%     \centering
+%         \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq05.png} 
+%         %\caption{Price regulation} \label{fig:timing3}
+%     \end{subfigure}
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq1.png} 
+%         %\caption{Competitors} \label{fig:timing2}
+%     \end{subfigure}
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq15.png} %\caption{Generic} \label{fig:timing1}
+%     \end{subfigure}
+%     \hfill
     
-    \begin{subfigure}[t]{0.32\textwidth}
-    \centering
-        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq2.png} 
-        %\caption{Price regulation} \label{fig:timing3}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
+%     \begin{subfigure}[t]{0.32\textwidth}
+%     \centering
+%         \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq2.png} 
+%         %\caption{Price regulation} \label{fig:timing3}
+%     \end{subfigure}
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq25.png} 
+%         %\caption{Competitors} \label{fig:timing2}
+%     \end{subfigure}
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq3.png} %\caption{Generic} \label{fig:timing1}
+%     \end{subfigure}
+%     \hfill
+%   \caption{As Fig. \ref{fig:varyingadak_supp}, on single-cell mouse data. The relative ordering of the data by $\algname$ neighborhood size (output confidence) is robust to $A$.}
+%   \label{fig:varyingadak_muris}
+% \end{figure}
+
+
+\begin{figure}
+    % \begin{subfigure}[t]{0.32\textwidth}
+    % \centering
+    %     \includegraphics[width=\linewidth]{figs/single_cell/tabula_Knorm_Aeq05.pdf} 
+    %     %\caption{Price regulation} \label{fig:timing3}
+    % \end{subfigure}
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq25.png} 
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_Knorm_Aeq10.pdf} 
         %\caption{Competitors} \label{fig:timing2}
     \end{subfigure}
-    \begin{subfigure}[t]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figs/single_cell/tabula_logadaK_Aeq3.png} %\caption{Generic} \label{fig:timing1}
+    % \begin{subfigure}[t]{0.32\textwidth}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{figs/single_cell/tabula_Knorm_Aeq15.pdf} %\caption{Generic} \label{fig:timing1}
+    % \end{subfigure}
+    % \hfill
+    \begin{subfigure}[t]{0.47\textwidth}
+    \centering
+        \includegraphics[width=\linewidth]{figs/single_cell/tabula_Knorm_Aeq40.pdf} 
+        %\caption{Price regulation} \label{fig:timing3}
     \end{subfigure}
     \hfill
-  \caption{As Fig. \ref{fig:varyingadak_supp}, on single-cell mouse data.}
-  \label{fig:varyingadak_muris}
+    % \begin{subfigure}[t]{0.45\textwidth}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{figs/single_cell/tabula_Knorm_Aeq30.pdf} 
+    %     %\caption{Competitors} \label{fig:timing2}
+    % \end{subfigure}
+    % \begin{subfigure}[t]{0.45\textwidth}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{figs/single_cell/tabula_Knorm_Aeq40.pdf} %\caption{Generic} \label{fig:timing1}
+    % \end{subfigure}
+    % \hfill
+  \caption{As Fig. \ref{fig:varyingadak_supp}, on single-cell mouse data, with the $\algname$ k-values replaced by their quantiles over the data. The relative ordering of the data by $\algname$ neighborhood size is fairly robust to $A$. Zoom in or see \texttt{http://35.239.251.24/aknn/} for details.}
+  \label{fig:varyingnormk_muris}
 \end{figure}
+
 
 
 
