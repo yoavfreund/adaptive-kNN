@@ -38,6 +38,12 @@ class TreeNode:
 class KDTree:
     
     def __init__(self, X, Y, feat_names=None, tgt_names=None):
+        self.num_feats = X.shape[1]
+        self.num_tgts = max(Y) + 1
+        if feat_names is None:
+            feat_names = ['x%d' % i for i in range(self.num_feats)]
+        if tgt_names is None:
+            tgt_names = ['y%d' % i for i in range(self.num_tgts)]
         self.feat_names = list(feat_names)
         self.tgt_names = list(tgt_names)
         both = list(zip(X, Y))
@@ -72,7 +78,7 @@ class KDTree:
     ## VISUALIZATION METHODS
     # visualize dataset
     def viz_data(self):
-        for y in [-1, 0, 1, 2]:
+        for y in [-1]+list(range(self.num_tgts)):
             plt.scatter(self.X[self.Y == y][:, 0], self.X[self.Y == y][:, 1],
                         label=(self.tgt_names+['removed label'])[y])
         plt.title('Iris Plants Dataset')
@@ -85,7 +91,6 @@ class KDTree:
         # recursively DFS through tree adding dividers to visualization
         dim = self.X.shape[1]
         assert dim == 2
-        vlines, hlines = [], []
         def recurse(node, d, rec_depth=0):
             if rec_depth > depth:
                 return
