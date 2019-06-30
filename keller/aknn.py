@@ -11,7 +11,7 @@ from sklearn.metrics import pairwise_distances
 
 
 
-def aknn(nbrs_arr, labels, thresholds, distinct_labels='ABCDEFGHIJ'):
+def aknn(nbrs_arr, labels, thresholds):
     """
     Apply AKNN rule for a query point, given its list of nearest neighbors.
     
@@ -34,6 +34,7 @@ def aknn(nbrs_arr, labels, thresholds, distinct_labels='ABCDEFGHIJ'):
     fracs_labels: array of shape (n_labels, n_neighbors)
         Fraction of each label in balls of different neighborhood sizes.
     """
+    distinct_labels = np.unique(labels)
     query_nbrs = labels[nbrs_arr]
     mtr = np.stack([query_nbrs == i for i in distinct_labels])
     rngarr = np.arange(len(nbrs_arr))+1
@@ -46,7 +47,7 @@ def aknn(nbrs_arr, labels, thresholds, distinct_labels='ABCDEFGHIJ'):
     return (pred_label, first_admissible_ndx, fracs_labels)
 
 
-def predict_nn_rule(nbr_list_sorted, labels, log_complexity=1.0, distinct_labels='ABCDEFGHIJ'):
+def predict_nn_rule(nbr_list_sorted, labels, log_complexity=1.0):
     """
     Given matrix of ordered nearest neighbors for each point, returns AKNN's label predictions and adaptive neighborhood sizes.
     
@@ -69,7 +70,6 @@ def predict_nn_rule(nbr_list_sorted, labels, log_complexity=1.0, distinct_labels
     pred_labels = []
     adaptive_ks = []
     thresholds = log_complexity/np.sqrt(np.arange(nbr_list_sorted.shape[1])+1)
-    distinct_labels = np.unique(labels)
     for i in range(nbr_list_sorted.shape[0]):
         (pred_label, adaptive_k_ndx, _) = aknn(nbr_list_sorted[i,:], labels, thresholds)
         pred_labels.append(pred_label)

@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 import numpy as np
-import scipy as sp
 
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
@@ -32,6 +31,8 @@ class KDTree:
     
     def __init__(self, X, Y, feat_names=None, tgt_names=None):
         self.num_feats = X.shape[1]
+#         self.dim_order = np.random.permutation(self.num_feats)
+        self.dim_order = np.arange(self.num_feats)
         self.num_tgts = len(set(Y))
         if feat_names is None:
             feat_names = ['x%d' % i for i in range(self.num_feats)]
@@ -49,14 +50,18 @@ class KDTree:
             self.insert(self.X[i], self.Y[i])
     
     def insert(self, x, y):
-        d = 0
+        d = self.dim_order[0]
         node = self.root
         while node.split_point is not None:
             if y not in [-1, None, 'NA']:
                 node.label_cnts[y] += 1
+            d = node.split_dim
             side = 'left' if x[d] < node.split_point[d] else 'right'
             node = getattr(node, side)
-            d = (d + 1) % x.size
+        idx = np.where(self.dim_order == d)[0][0]
+        d = self.dim_order[(idx + 1) % x.size]
+        # d = (d + 1) % x.size # split across each dimension sequentially
+        # d = np.random.randint(x.size) # pick a random dimension each time
         node.split(x, d)
         node.left.label_cnts[y] += 1
         node.right.label_cnts[y] += 1
@@ -68,8 +73,8 @@ class KDTree:
         node = self.root
         while node.split_point is not None:
             seq.append(node)
+            d = node.split_dim
             node = node.left if x[d] < node.split_point[d] else node.right
-            d = (d + 1) % x.size
         return seq[::-1]
     
     # get prediction on sample
@@ -85,7 +90,7 @@ class KDTree:
             if eta >= delta:
                 return pred
     
-    ## VISUALIZATION METHODS FOR 2D DATA
+    ## VISUALIZATION METHODS FOR IRIS PLANTS (2D) DATA
     # visualize dataset
     def viz_data(self):
         for y in [-1]+list(range(self.num_tgts)):
