@@ -32,11 +32,11 @@ class KDTree:
     
     def __init__(self, X, Y, feat_names=None, tgt_names=None):
         self.num_feats = X.shape[1]
-        self.num_tgts = len(set(Y))+1
+        self.num_tgts = len(set(Y))
         if feat_names is None:
             feat_names = ['x%d' % i for i in range(self.num_feats)]
         if tgt_names is None:
-            tgt_names = ['y%d' % i for i in range(self.num_tgts)]
+            tgt_names = list(set(Y))
         self.feat_names = list(feat_names)
         self.tgt_names = list(tgt_names)
         both = list(zip(X, Y))
@@ -52,7 +52,8 @@ class KDTree:
         d = 0
         node = self.root
         while node.split_point is not None:
-            node.label_cnts[y] += 1
+            if y not in [-1, None, 'NA']:
+                node.label_cnts[y] += 1
             side = 'left' if x[d] < node.split_point[d] else 'right'
             node = getattr(node, side)
             d = (d + 1) % x.size
@@ -61,7 +62,7 @@ class KDTree:
         node.right.label_cnts[y] += 1
     
     # get sequence of specialists converging to {x}
-    def get_node_seq(self, x):
+    def get_seq(self, x):
         seq = []
         d = 0
         node = self.root
@@ -69,18 +70,20 @@ class KDTree:
             seq.append(node)
             node = node.left if x[d] < node.split_point[d] else node.right
             d = (d + 1) % x.size
-        return seq
+        return seq[::-1]
     
-    # get sequence of specialists converging to {x}
-    def get_seq(self, x):
-        seq = []
-        d = 0
-        node = self.root
-        while node.split_point is not None:
-            seq.append(node.bounds)
-            node = node.left if x[d] < node.split_point[d] else node.right
-            d = (d + 1) % x.size
-        return seq
+    # get prediction on sample
+    def get_pred(self, x, conf=1.0, verbose=False):
+        for n in self.get_seq(x):
+            cnts = n.label_cnts
+            pred = max(self.tgt_names, key=lambda k: cnts[k])
+            k = sum(cnts.values())
+            eta = (cnts[pred] / k) - (1 / self.num_tgts)
+            delta = conf / np.sqrt(k)
+            if verbose:
+                print('%s \t eta=%.3f \t delta=%.3f \t k=%d' % (pred, eta, delta, k))
+            if eta >= delta:
+                return pred
     
     ## VISUALIZATION METHODS FOR 2D DATA
     # visualize dataset
