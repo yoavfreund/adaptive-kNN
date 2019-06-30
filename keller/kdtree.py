@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import numpy as np
 import scipy as sp
 
@@ -13,28 +15,24 @@ class TreeNode:
         self.bounds = bounds
         self.left = self.right = None
         self.split_point = self.split_dim = None
+        self.label_cnts = defaultdict(int)
     
     def split(self, x, d):
         self.split_point = x
         self.split_dim = d
         bounds_left = self.bounds.copy()
         bounds_right = self.bounds.copy()
-        bounds_left[d][1] = x
-        bounds_right[d][0] = x
+        bounds_left[d][1] = x[d]
+        bounds_right[d][0] = x[d]
         self.left = TreeNode(bounds_left)
         self.right = TreeNode(bounds_right)
 
-    # propagate bias from children
-    def prop_bias(self):
-        if self.split_point is None:
-            return
-        pass
         
 class KDTree:
     
     def __init__(self, X, Y, feat_names=None, tgt_names=None):
         self.num_feats = X.shape[1]
-        self.num_tgts = max(Y) + 1
+        self.num_tgts = len(set(Y))+1
         if feat_names is None:
             feat_names = ['x%d' % i for i in range(self.num_feats)]
         if tgt_names is None:
@@ -46,27 +44,41 @@ class KDTree:
         self.X, self.Y = zip(*both)
         self.X, self.Y = np.array(self.X), np.array(self.Y)
         self.root = TreeNode(np.array([[self.X[:, d].min(), self.X[:, d].max()]
-                                   for d in range(X.shape[1])]))
+                                       for d in range(X.shape[1])]))
         for i in range(self.X.shape[0]):
-            self.insert(self.X[i])
+            self.insert(self.X[i], self.Y[i])
     
-    def insert(self, x):
+    def insert(self, x, y):
         d = 0
         node = self.root
-        while node.split_point:
-            side = 'left' if x[d] < node.split_point else 'right'
+        while node.split_point is not None:
+            node.label_cnts[y] += 1
+            side = 'left' if x[d] < node.split_point[d] else 'right'
             node = getattr(node, side)
             d = (d + 1) % x.size
-        node.split(x[d], d)
+        node.split(x, d)
+        node.left.label_cnts[y] += 1
+        node.right.label_cnts[y] += 1
+    
+    # get sequence of specialists converging to {x}
+    def get_node_seq(self, x):
+        seq = []
+        d = 0
+        node = self.root
+        while node.split_point is not None:
+            seq.append(node)
+            node = node.left if x[d] < node.split_point[d] else node.right
+            d = (d + 1) % x.size
+        return seq
     
     # get sequence of specialists converging to {x}
     def get_seq(self, x):
         seq = []
         d = 0
         node = self.root
-        while node.split_point:
+        while node.split_point is not None:
             seq.append(node.bounds)
-            node = node.left if x[d] < node.split_point else node.right
+            node = node.left if x[d] < node.split_point[d] else node.right
             d = (d + 1) % x.size
         return seq
     
@@ -91,7 +103,7 @@ class KDTree:
                 return
             if node is None:
                 return
-            [plt.vlines, plt.hlines][d]([node.split_point], *node.bounds[1-d])
+            [plt.vlines, plt.hlines][d]([node.split_point[d]], *node.bounds[1-d])
             # make new specialist contexts for recursion
             d = (d + 1) % dim
             recurse(node.left, d, rec_depth+1)
