@@ -82,7 +82,7 @@ class KDTree:
             d = (d + 1) % x.size
         return seq
     
-    ## VISUALIZATION METHODS
+    ## VISUALIZATION METHODS FOR 2D DATA
     # visualize dataset
     def viz_data(self):
         for y in [-1]+list(range(self.num_tgts)):
