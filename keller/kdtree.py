@@ -6,11 +6,6 @@ from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
 
 
-
-def reloadtest():
-    print('gggg')
-
-
 # Node of K-D Tree, corresponds to a specialist.
 class TreeNode:
     
