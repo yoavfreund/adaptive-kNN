@@ -6,13 +6,12 @@ https://arxiv.org/abs/1905.12717
 Author: Akshay Balsubramani
 """
 
-import numpy as np, sklearn, umap
-import sklearn.metrics
-from sklearn import preprocessing
+import numpy as np
+from sklearn.metrics import pairwise_distances
 
 
 
-def aknn(nbrs_arr, labels, thresholds, distinct_labels=['A','B','C','D','E','F','G','H','I','J']):
+def aknn(nbrs_arr, labels, thresholds, distinct_labels='ABCDEFGHIJ'):
     """
     Apply AKNN rule for a query point, given its list of nearest neighbors.
     
@@ -47,7 +46,7 @@ def aknn(nbrs_arr, labels, thresholds, distinct_labels=['A','B','C','D','E','F',
     return (pred_label, first_admissible_ndx, fracs_labels)
 
 
-def predict_nn_rule(nbr_list_sorted, labels, log_complexity=1.0, distinct_labels=['A','B','C','D','E','F','G','H','I','J']):
+def predict_nn_rule(nbr_list_sorted, labels, log_complexity=1.0, distinct_labels='ABCDEFGHIJ'):
     """
     Given matrix of ordered nearest neighbors for each point, returns AKNN's label predictions and adaptive neighborhood sizes.
     
@@ -91,7 +90,7 @@ def calc_nbrs_exact(raw_data, k=1000):
     nbr_list_sorted: array of shape (n_samples, n_neighbors)
         Indices of the `n_neighbors` nearest neighbors in the dataset, for each data point.
     """
-    a = sklearn.metrics.pairwise_distances(raw_data)
+    a = pairwise_distances(raw_data)
     nbr_list_sorted = np.argsort(a, axis=1)[:, 1:]
     return nbr_list_sorted[:, :k]
 
